@@ -1,6 +1,5 @@
 import neo4j
 
-
 # @param(r1, r2) id delle relazioni
 # return --> true se la relazione ha la stessa entita' di partenza, false altrimenti
 def sameSource(r1, r2, conn):
@@ -256,12 +255,27 @@ def srcCheck(entSrc: int, entDst: int, rel: str, conn):
     return conn.query(q)[0][0]  # type: ignore
 
 
+def alreadyLinked(entSrc : int, entDst: int, rel: str, conn):
+    q = (
+        "match (e1) -[r:"
+        + rel
+        + "]-> (e2) where id(e1) = "
+        + str(entSrc)
+        + " and id(e2) = "
+        + " return count(r) > 0"
+    )
+    return conn.query(q)[0][0]  # type: ignore
+
+
 # per controllare che non avvengano inserimenti contraddittori
 # Pre-condizioni:  entSrc deve essere un intero indicante un'entita' esistente all'interno del db
 #                 entDst deve essere un intero indicante un'entita' esistente all'interno del db
 #                 rel deve essere una stringa rappresentate una relazione che ha un metamodello definito
 # Post-condizioni: True se l'inserimento puo' avvenire, False altrimenti
 def checkInsertion(entSrc: int, entDst: int, rel: str, conn):
+    if alreadyLinked(entSrc, entDst, rel, conn):
+        return False
+    
     presentContr = getContraddictory(
         rel, 1, conn
     )  # ottengo tutte le relazioni in contraddizioni con quella da inserire
@@ -270,6 +284,7 @@ def checkInsertion(entSrc: int, entDst: int, rel: str, conn):
         # si controlla se nell'entita' sorgente e' presente questa relazione in contraddizione con quella da inserire
         if srcCheck(entSrc, entDst, p, conn):
             return False
+
 
     return True
 
@@ -284,12 +299,42 @@ def areDirectlyContraddictory(relType1, relType2, idR1, idR2, conn):
                 return True
         return False
 
+# ES_attr && ET_attr && relAttr--> dictionaries
+def create_relation_with_attribute(typeES, ES_attr, gS, typeET, ET_attr, gT, relName, relAttr, conn):
+    with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:  # type: ignore
+        with session.begin_transaction() as tx:
+            if checkInsertion(
+                getId(typeES, ES_attr, gS, conn),
+                getId(typeET, ET_attr, gT, conn),
+                relName,
+                conn,
+            ):
+                return "RELAZIONE in contraddizione diretta con un'altra pre esistente"
+            elif canCreate(typeET, ET_attr, gT, relName, conn):
+                q = "MATCH (eT:" + typeET + " { graph:" + str(gT)
+                for el in ET_attr.items():
+                    q += ", " + el[0] + ': "' + el[1] + '"'
+                q += "}) MATCH (eS:" + typeES + "{ graph: " + str(gS)
+                for el in ES_attr.items():
+                    q += ", " + el[0] + ': "' + el[1] + '"'
+                q += "}) CREATE (eS) -[r:" + relName + "{ "
+                for el in relAttr.items():
+                    q += el[0] + ': "' + el[1] + ", "
+                q = q[:-2]
+                q += " }]-> (eT)"
+                tx.run(q)
+                return "OK"
+            else:
+                return "RELAZIONE già presente/supera il limite"
 
 # @title Utility function per integrare (almeno) le relazioni con scadenza
-
 # per inserire relazioni con attributi devo ampliare la funzione pre-esistente, utilizzando overloading della vecchia funzione
-
 # per controllare se non e' scaduta e se puo' essere inserita o se considerarla in analisi
 def isOver(relID, conn):
-    # TODO
+    q = "match () -[r]-> () where id(r) = " + str(relID) + " return r.scadenza"
+    result = conn.query(q)
+    if (len(result) == 0):
+        raise Exception("RelationID {} non ha attributo scadenza".format(relID))
+    data = result.pop()[0]
+    print(data)
     return False

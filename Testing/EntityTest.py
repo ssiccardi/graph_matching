@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, '../Functions/')
+sys.path.insert(0, '..')
 
 import Functions.EntityMatching as em
 from Functions.Connection import Connection
