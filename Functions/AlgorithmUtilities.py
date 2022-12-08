@@ -1,6 +1,5 @@
 from Functions.Relation import getLimit, isSemiFissa
 
-# @title Matching di entità
 def isNode(el):
     return str(type(el)) == "<class 'neo4j.graph.Node'>"
 
@@ -13,9 +12,17 @@ def whichGraph(g):
     raise Exception("Errore con variabile", g, " -- Valore non ammesso")
 
 
-# @param(ideng) = {key:value, ...}
-# @param(g) = "G1" or "G2"
-def getAttr(ideng, g, conn):  # ritorna una lista di chiavi valori
+def getAttr(ideng, g, conn):  
+    """Ritorna una lista di chiavi valori con gli attributi
+
+    Args:
+        ideng (int): id dell'entita'
+        g (str): grafo da cui prendere gli attributi
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Returns:
+        dict: key-value attributes
+    """    
     d = {}
     q = (
         "match (p) where "
@@ -39,6 +46,16 @@ def getAttr(ideng, g, conn):  # ritorna una lista di chiavi valori
 
 
 def getIdenName(ideng, g, conn):
+    """Ritorna una lista di attributi identitari
+
+    Args:
+        ideng (int): id dell'entita'
+        g (str): grafo da cui prendere gli attributi
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Returns:
+        list: attributi identitari
+    """    
     l = list()
     q = (
         "match (p) where "
@@ -85,11 +102,16 @@ def removeAttr(attr, rem):
     for r in rem:
         attr.pop(r)
 
-
-# @title Utility per relazioni
-
-# Data una lista di relazioni, ritorna solo le SemiFisse
 def onlySemi(lista, conn):
+    """Filtra le relazioni non SemiFisse
+
+    Args:
+        lista (list): lista di relazioni
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Returns:
+        list: lista di relazioni SemiFisse
+    """    
     l = list()
     for el in lista:
         if isSemiFissa(el.get("tipo"), conn):
@@ -97,8 +119,16 @@ def onlySemi(lista, conn):
     return l
 
 
-# Data una lista di relazioni, elimina le SemiFisse
 def deleteSemi(lista, conn):
+    """Filtra le relazioni SemiFisse
+
+    Args:
+        lista (list): lista di relazioni
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Returns:
+        list: lista di relazioni SemiFisse
+    """    
     l = list()
     for el in lista:
         if not isSemiFissa(el.get("tipo"), conn):
@@ -228,7 +258,7 @@ def sameSource(r1, r2, conn):
 def overLimit(tipo, val, l1, l2, conn):
     l = list()
     if val > getLimit(tipo, conn):
-        l.append(
+        l.append( # type: ignore
             "Relazione di tipo "
             + tipo
             + " contraddittoria, nei due grafi esplorati esistono ben "
