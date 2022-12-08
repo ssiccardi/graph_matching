@@ -17,14 +17,11 @@ def entityMatching(ideng, conn):
     Returns:
         str: esito dell'analisi
     """    
-    # TODO: Riserva una parte al confronto degli attributi identificatori
     if canProceed(ideng, conn):
-        attrG1, attrG2 = getAttr(ideng, "G1", conn), getAttr(
-            ideng, "G2", conn
-        )  # gia' ordinati per chiave alfabeticamente
-        toExaminG1, toExaminG2 = getIdenName(ideng, "G1", conn), getIdenName(
-            ideng, "G2", conn
-        )  # gia' ordinati per chiave alfabeticamente
+        attrG1, attrG2 = getAttr(ideng, "G1", conn), getAttr(ideng, "G2", conn)
+        toExaminG1, toExaminG2 = getIdenName(ideng, "G1", conn), getIdenName(ideng, "G2", conn)  
+        # gia' ordinati per chiave alfabeticamente
+        
         toRemoveG1 = list()
 
         if toExaminG1 == toExaminG2:
