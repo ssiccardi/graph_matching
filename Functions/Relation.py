@@ -1,8 +1,16 @@
 import neo4j
 
-# @param(r1, r2) id delle relazioni
-# return --> true se la relazione ha la stessa entita' di partenza, false altrimenti
 def sameSource(r1, r2, conn):
+    """Controlla se le relazioni hanno la stessa entita' di partenza
+
+    Args:
+        r1 (int or str): id della relazione in grafo1
+        r2 (int or str): id della relazione in grafo2
+        conn (Connnection): oggetto dedicato alla connessione a Neo4j
+
+    Returns:
+        bool: True se hanno stessa fonte, False altrimenti
+    """    
     q = (
         "match (e) -[r]-> () where id(r) = "
         + str(r1)
@@ -12,9 +20,16 @@ def sameSource(r1, r2, conn):
     )
     return conn.query(q).pop()[0]  # type: ignore
 
-
-# @title Funzione di creazione relazioni
 def getLimit(tipo, conn):
+    """Ottiene la Cardinalita per una relazione semifissa
+
+    Args:
+        tipo (str): nome della relazione
+        conn (Connectio): oggetto dedicato alla connessione a Neo4j
+
+    Returns:
+        int: Cardinalita relazione se presente, ?unknown? altrimenti
+    """    
     q = (
         "MATCH (e) -[:HAS]-> (ee) WHERE e.label ='"
         + tipo
@@ -23,9 +38,16 @@ def getLimit(tipo, conn):
     return int(conn.query(q).pop()[0])  # type: ignore
 
 
-# @param(tipo) il nome per trovarla nel metamodello
-# return --> true se la relazione e' di tipo SemiFisso, false altrimenti
 def isSemiFissa(tipo, conn):
+    """Capisce se la relazione e' di tipo SemiFisso
+
+    Args:
+        tipo (str): nome della relazione
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Returns:
+        bool: True se SemiFissa, False altrimenti
+    """    
     q = (
         "match (e) -[:HAS]-> (something) where e.label = '"
         + tipo
@@ -37,6 +59,15 @@ def isSemiFissa(tipo, conn):
 # @param(tipo) il nome per trovarla nel metamodello
 # return --> true se la relazione e' di tipo Fisso, false altrimenti
 def isFissa(tipo, conn):
+    """Capisce se la relazione e' di tipo Fisso
+
+    Args:
+        tipo (str): nome della relazione
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Returns:
+        bool: True se Fissa, False altrimenti
+    """    
     q = (
         "match (e) -[:HAS]-> (something) where e.label = '"
         + tipo
@@ -46,6 +77,15 @@ def isFissa(tipo, conn):
 
 
 def isMultipla(tipo, conn):
+    """Capisce se la relazione e' di tipo Multiplo
+
+    Args:
+        tipo (str): nome della relazione
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Returns:
+        bool: True se Multipla, False altrimenti
+    """    
     q = (
         "match (e) -[:HAS]-> (something) where e.label = '"
         + tipo
@@ -55,6 +95,18 @@ def isMultipla(tipo, conn):
 
 
 def canCreate(tipoT, attrT, grafoT, relName, conn):
+    """Capisce se la relazione tra le due entita' puo' essere creata. Quindi si chiede se tra le due e' gia' presente la relazione, se attiverebbe contraddizioni e cosi' via
+
+    Args:
+        tipoT (str): tipo dell'entita' target
+        attrT (dict): attributi dell'entita' target
+        grafoT (int or str): grafo dell'entita' target
+        relName (str): nome della relazione 
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Returns:
+        bool: True se passa tutti i controlli, False altrimenti
+    """    
     if not isMultipla(relName, conn):
         q = (
             "MATCH () -[r:"
@@ -73,21 +125,45 @@ def canCreate(tipoT, attrT, grafoT, relName, conn):
             q += " = 1"
         else:
             q += " = " + str(getLimit(relName, conn))
-        res = conn.query(q)  # fai un test!
+        res = conn.query(q)
         return not res[0][0]  # type: ignore
     return True
 
 
-def getId(t, attr, g, conn):  # tipo, dizionario attributi, grafo
+def getId(t, attr, g, conn):
+    """Ottiene l'ID dell'entita riconosciuta da attributi dati e nel grafo indicato. 
+
+    Args:
+        t (_type_): tipo dell'entita'
+        attr (dict): key-value attributes
+        g (int o str): grafo
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Returns:
+        int: id automatico di Neo4j
+    """    
     q = "MATCH (e:" + t + " { graph:" + str(g)
     for el in attr.items():
         q += ", " + el[0] + ': "' + el[1] + '"'
     q += "}) RETURN id(e)"
     return conn.query(q)[0][0]  # type: ignore
 
-
-# ES_attr && ET_attr --> dictionaries
 def create_relation_dir(typeES, ES_attr, gS, typeET, ET_attr, gT, relName, conn):
+    """Crea, se possibile, una relazione tra l'entita' sorgente e quella destinazione, riconosciute tramite i parametri passati, con nome specificato
+
+    Args:
+        typeES (str): tipo dell'entita' sorgente 
+        ES_attr (dict): key-value attributes sorgente
+        gS (int or str): grafo sorgente
+        typeET (str): tipo dell'entita' destinazione
+        ET_attr (dict): key-value attributes destinazione
+        gT (int or str): grafo destinazione
+        relName (str): nome della relazione
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Returns:
+        str: OK se non ci sono errori
+    """    
     with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:  # type: ignore
         with session.begin_transaction() as tx:
             if checkInsertion(
@@ -111,9 +187,14 @@ def create_relation_dir(typeES, ES_attr, gS, typeET, ET_attr, gT, relName, conn)
                 return "RELAZIONE già presente/supera il limite"
 
 
-# @title Aggiungere attributo a metamodello relazione esistente: [SKIP]
-# AGGIUNGERE ATTRIBUTI
 def addRelAttribute(conn, t, attribute):
+    """Aggiunge un'attributo al metamodello di una relazione
+
+    Args:
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+        t (str): tipo della relazione
+        attribute (str): nome dell'attributo da aggiungere
+    """    
     with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
         with session.begin_transaction() as tx:
 
@@ -177,13 +258,18 @@ def addRelAttribute(conn, t, attribute):
             elif flag == "n":
                 print("Operation aborted.")
 
-
-# @title Utility function per integrare contraddizioni dirette
-
-# funzione di utility per vedere se due metamodelli sono gia' collegati da una relazione di tipo t
-# Pre-condizioni: t1, t2, t devono essere stringhe
-# Post-condizioni: True se esiste gia' una relazione, False altrimenti
 def alreadyExist(t1: str, t2: str, t: str, conn):
+    """funzione di utility per vedere se due metamodelli sono gia' collegati da una relazione di tipo t
+
+    Args:
+        t1 (str): nome primo metamodello
+        t2 (str): nome secondo metamodello
+        t (str): _description_
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Returns:
+        bool: True se esiste gia' una relazione, False altrimenti
+    """    
     q = (
         "match (t1) match (t2) where t1.label = '"
         + t1
@@ -201,6 +287,17 @@ def alreadyExist(t1: str, t2: str, t: str, conn):
 #                 relType deve essere una stringa che indica una relazione tra metamodelli (eg: CONTRADDITTORI)
 # Post-condizioni: True se la relazione non era pre esistente e la creazione ha avuto successo, False altrimenti
 def addConstraint(relType1: str, relType2: str, relType: str, conn):
+    """Aggiunge un link, con nome specificato in relType, tra metamodelli (se non esiste gia')
+
+    Args:
+        relType1 (str): nome prima relazione
+        relType2 (str): nome seconda relazione
+        relType (str): nome link da aggiungere
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Returns:
+        bool: True se e' stato possibile aggiungerlo, False altrimenti
+    """    
     if not alreadyExist(relType1, relType2, relType, conn):
         q = (
             "match (t1) match (t2) where t1.label = '"
@@ -214,11 +311,20 @@ def addConstraint(relType1: str, relType2: str, relType: str, conn):
         return conn.query(q)[0][0]  # type: ignore
     return False
 
-
-# ottieni attributi contraddittori
-# Pre-condizioni: t == 0 --> par e' id di entita' di destinazione || t == 1 --> par e' tipo di relazione
-# Post-condizioni: ottieni una lista di relazioni possibilmente contraddittorie
 def getContraddictory(par, t: int, conn):
+    """Ottiene relazioni contraddittorie
+
+    Args:
+        par (int or str): id dell'entita' di destinazione or tipo di relazione
+        t (int): specifica dove cercare, 0 per entita' o 1 per relazione
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Raises:
+        ValueError: t != 0 and t != 1
+
+    Returns:
+        list: lista di relazioni contraddittorie per l'entita' o la relazione data
+    """    
     if t == 1:  # tipo di relazione
         q = (
             "match (e1) where e1.label = '"
@@ -240,9 +346,18 @@ def getContraddictory(par, t: int, conn):
 
     return l
 
-
-# Controlla se esiste rel tra le due entita'
 def srcCheck(entSrc: int, entDst: int, rel: str, conn):
+    """Controlla se esiste rel tra le due entita'
+
+    Args:
+        entSrc (int): id dell'entita' di destinazione
+        entDst (int): id dell'entita' di destinazione
+        rel (str): relazione da controllare
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Returns:
+        bool: True se esiste, False altrimenti
+    """    
     q = (
         "match (e1) -[r:"
         + rel
@@ -256,35 +371,50 @@ def srcCheck(entSrc: int, entDst: int, rel: str, conn):
 
 
 def alreadyLinked(entSrc : int, entDst: int, rel: str, conn):
+    """Controlla se esiste rel tra le due entita'
+
+    Args:
+        entSrc (int): id dell'entita' di destinazione
+        entDst (int): id dell'entita' di destinazione
+        rel (str): relazione da controllare
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Returns:
+        bool: True se esiste, False altrimenti
+    """ 
     q = (
         "match (e1) -[r:"
         + rel
         + "]-> (e2) where id(e1) = "
         + str(entSrc)
         + " and id(e2) = "
+        + str(entDst)
         + " return count(r) > 0"
     )
     return conn.query(q)[0][0]  # type: ignore
 
 
-# per controllare che non avvengano inserimenti contraddittori
-# Pre-condizioni:  entSrc deve essere un intero indicante un'entita' esistente all'interno del db
-#                 entDst deve essere un intero indicante un'entita' esistente all'interno del db
-#                 rel deve essere una stringa rappresentate una relazione che ha un metamodello definito
-# Post-condizioni: True se l'inserimento puo' avvenire, False altrimenti
 def checkInsertion(entSrc: int, entDst: int, rel: str, conn):
+    """Controlla che non avvengano inserimenti contraddittori / non sia gia' presente
+
+    Args:
+        entSrc (int): deve essere un intero indicante un'entita' esistente all'interno del db
+        entDst (int): deve essere un intero indicante un'entita' esistente all'interno del db
+        rel (str): deve essere una stringa rappresentate una relazione che ha un metamodello definito
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Returns:
+        bool: True se inseribile, False altrimenti
+    """    
     if alreadyLinked(entSrc, entDst, rel, conn):
         return False
     
-    presentContr = getContraddictory(
-        rel, 1, conn
-    )  # ottengo tutte le relazioni in contraddizioni con quella da inserire
+    presentContr = getContraddictory(rel, 1, conn)  
+    # ottengo tutte le relazioni in contraddizioni con quella da inserire
 
-    for p in presentContr:
-        # si controlla se nell'entita' sorgente e' presente questa relazione in contraddizione con quella da inserire
-        if srcCheck(entSrc, entDst, p, conn):
+    for p in presentContr: # si controlla se nell'entita' sorgente e' presente questa relazione in contraddizione con quella da inserire
+        if alreadyLinked(entSrc, entDst, p, conn):
             return False
-
 
     return True
 
@@ -299,8 +429,23 @@ def areDirectlyContraddictory(relType1, relType2, idR1, idR2, conn):
                 return True
         return False
 
-# ES_attr && ET_attr && relAttr--> dictionaries
 def create_relation_with_attribute(typeES, ES_attr, gS, typeET, ET_attr, gT, relName, relAttr, conn):
+    """Crea, se possibile, una relazione tra l'entita' sorgente e quella destinazione, riconosciute tramite i parametri passati, con nome e con attributi specificati
+
+    Args:
+        typeES (str): tipo dell'entita' sorgente 
+        ES_attr (dict): key-value attributes sorgente
+        gS (int or str): grafo sorgente
+        typeET (str): tipo dell'entita' destinazione
+        ET_attr (dict): key-value attributes destinazione
+        gT (int or str): grafo destinazione
+        relName (str): nome della relazione
+        relAttr (str): attributi associati alla relazione
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Returns:
+        str: OK se non ci sono errori
+    """ 
     with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:  # type: ignore
         with session.begin_transaction() as tx:
             if checkInsertion(

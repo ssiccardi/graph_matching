@@ -6,6 +6,15 @@ class Connection:
         self.driver = GraphDatabase.driver(uri, auth=(user, password))
     
     def query(self, query, db=None):
+        """Permette di interrogare il database, senza controlli in input
+
+        Args:
+            query (str): query\n
+            db (str, optional): In caso di piu' DB. Defaults to None.
+
+        Returns:
+            Neo4jRecord: In base alla query
+        """
         assert self.driver is not None, "Driver not initialized!"
         session = None
         response = None

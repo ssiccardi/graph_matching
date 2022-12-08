@@ -2,11 +2,13 @@
 from Functions.AlgorithmUtilities import createTypeBucket, getRel, getSemi, overLimit, sameRel, sameSource, sameTarget
 from Functions.Relation import areDirectlyContraddictory, isFissa
 
-
-# @param(id) id_ent
-# @param(grafo) numero che indica in quale grafo prendere le relazioni
-# return --> lista di stringhe che indicano le osservazioni sulle relazioni semifisse all'interno del grafo specificato
 def getInfoSemi(id, conn):
+    """Analizza le relazioni SemiFisse legate all'id passato in input, mostrando all'utente cosa nota
+
+    Args:
+        id (int): id appartente all'entita' da analizzare\n
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+    """
     relP1, relP2 = getSemi(id, 1, 0, conn), getSemi(
         id, 2, 0, conn
     )  # zero analisi da fare qui
@@ -94,14 +96,16 @@ def getInfoSemi(id, conn):
                 print("Relazione complementare in G2 di tipo {} con entità di partenza id:{} e entità di arrivo id:{}".format(el.get("tipo"), el.get("da"), el.get("a")))  # type: ignore
 
 
-# @title Matching relazioni
-
-# precondizioni:
-# Le entita' esistono e non sono contraddittorie
-# Le relazioni fisse hanno subito un controllo in inserimento, non ci possono essere piu' relazioni fisse uguali appartenenti alla stessa entita' di uno stesso grafo
-# Le relazioni semifisse hanno subito lo stesso controllo in inserimento!
-# Il controllo sulle relazioni semifisse avviene in blocco, pertanto se si troveranno piu' delle relazioni ammesse, contate senza molteplicità verrà segnalato
 def relationMatching(id, conn):
+    """Analizza le relazioni legate all'id passato in input, mostrando all'utente cosa nota\n
+    PreCondizioni:
+        1)Le entita' esistono e non sono contraddittorie\n
+        2)Le relazioni fisse hanno subito un controllo in inserimento, non ci possono essere piu' relazioni fisse uguali appartenenti alla stessa entita' di uno stesso grafo\n
+        3)Le relazioni semifisse hanno subito lo stesso controllo in inserimento!\n
+    Args:
+        id (int): [id appartente all'entita' da analizzare]\n
+        conn (Connection): [oggetto dedicato alla connessione a Neo4j]
+    """    
     relP1, relP2 = getRel(id, 1, 0, conn), getRel(id, 2, 0, conn)
     relE1, relE2 = getRel(id, 1, 1, conn), getRel(id, 2, 1, conn)
 
