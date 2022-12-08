@@ -8,6 +8,15 @@ from Functions.AlgorithmUtilities import (
 
 
 def entityMatching(ideng, conn):
+    """Analizza due entita' e i loro attributi in due sottografi differenti
+
+    Args:
+        ideng (int): id dell'entita', deve esistere
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Returns:
+        str: esito dell'analisi
+    """    
     # TODO: Riserva una parte al confronto degli attributi identificatori
     if canProceed(ideng, conn):
         attrG1, attrG2 = getAttr(ideng, "G1", conn), getAttr(
