@@ -1,12 +1,13 @@
 
 from Functions.AlgorithmUtilities import createTypeBucket, getRel, getSemi, overLimit, sameRel, sameSource, sameTarget
 from Functions.Relation import areDirectlyContraddictory, isFissa
+from Functions.Connection import Connection
 
-def getInfoSemi(id, conn):
+def getInfoSemi(id: int, conn: Connection):
     """Analizza le relazioni SemiFisse legate all'id passato in input, mostrando all'utente cosa nota
 
     Args:
-        id (int): id appartente all'entita' da analizzare\n
+        id (int): id appartenente all'entita' da analizzare\n
         conn (Connection): oggetto dedicato alla connessione a Neo4j
     """
     relP1, relP2 = getSemi(id, 1, 0, conn), getSemi(
@@ -96,7 +97,7 @@ def getInfoSemi(id, conn):
                 print("Relazione complementare in G2 di tipo {} con entità di partenza id:{} e entità di arrivo id:{}".format(el.get("tipo"), el.get("da"), el.get("a")))  # type: ignore
 
 
-def relationMatching(id, conn):
+def relationMatching(id: int, conn: Connection):
     """Analizza le relazioni legate all'id passato in input, mostrando all'utente cosa nota\n
     PreCondizioni:
         1)Le entita' esistono e non sono contraddittorie\n

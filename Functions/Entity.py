@@ -1,8 +1,9 @@
 import neo4j
 from Functions.DbUtilities import check_instance, legal_attributes, stringify_attributes
+from Functions.Connection import Connection
 
 # @title CREA ISTANZA CON ID MIO
-def create_instance_mine(conn, t, attributes, graph, id):
+def create_instance_mine(conn: Connection, t, attributes, graph, id):
     """Crea un'entita' con attributi dati, nel grafo dato e di tipologia data. Inoltre permette di specificare un id extra
 
     Args:
@@ -32,7 +33,7 @@ def create_instance_mine(conn, t, attributes, graph, id):
                     + str(id)
                     + "}) RETURN p.id AS node_id"
                 )
-                create_id = str(create_query.single()["node_id"])
+                create_id = str(create_query.single()["node_id"]) # type: ignore
                 print(str(legal_attrs) + " " + str(create_id))
                 return create_id
             else:
@@ -46,13 +47,13 @@ def create_instance_mine(conn, t, attributes, graph, id):
                         + stringify_attributes(attributes)
                         + "}) RETURN instance.id AS node_id"
                     )
-                    create_id = str(instance_query.single()["node_id"])
+                    create_id = str(instance_query.single()["node_id"]) # type: ignore
                     return create_id
 
             tx.commit()
             tx.close()
             
-def delete_instance(conn, t, attributes):
+def delete_instance(conn: Connection, t: str, attributes):
     """Elimina un'entita' con attributi dati e di tipologia data. IN ENTRAMBI I GRAFI
 
     Args:
@@ -71,7 +72,7 @@ def delete_instance(conn, t, attributes):
                 print("Uniquely identified instance")
                 tx.run(
                     "MATCH (instance:"
-                    + str(t)
+                    + t
                     + " {"
                     + stringify_attributes(legal_attr)
                     + "}) DETACH DELETE instance"

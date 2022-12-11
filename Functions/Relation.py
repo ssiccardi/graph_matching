@@ -1,6 +1,7 @@
+from Functions.Connection import Connection
 import neo4j
 
-def sameSource(r1, r2, conn):
+def sameSource(r1, r2, conn: Connection)-> bool:
     """Controlla se le relazioni hanno la stessa entita' di partenza
 
     Args:
@@ -20,7 +21,7 @@ def sameSource(r1, r2, conn):
     )
     return conn.query(q).pop()[0]  # type: ignore
 
-def getLimit(tipo, conn):
+def getLimit(tipo: str, conn: Connection)-> int:
     """Ottiene la Cardinalita per una relazione semifissa
 
     Args:
@@ -38,7 +39,7 @@ def getLimit(tipo, conn):
     return int(conn.query(q).pop()[0])  # type: ignore
 
 
-def isSemiFissa(tipo, conn):
+def isSemiFissa(tipo: str, conn: Connection)-> bool:
     """Capisce se la relazione e' di tipo SemiFisso
 
     Args:
@@ -58,7 +59,7 @@ def isSemiFissa(tipo, conn):
 
 # @param(tipo) il nome per trovarla nel metamodello
 # return --> true se la relazione e' di tipo Fisso, false altrimenti
-def isFissa(tipo, conn):
+def isFissa(tipo: str, conn: Connection)-> bool:
     """Capisce se la relazione e' di tipo Fisso
 
     Args:
@@ -76,7 +77,7 @@ def isFissa(tipo, conn):
     return conn.query(q).pop()[0]  # type: ignore
 
 
-def isMultipla(tipo, conn):
+def isMultipla(tipo: str, conn: Connection)-> bool:
     """Capisce se la relazione e' di tipo Multiplo
 
     Args:
@@ -94,7 +95,7 @@ def isMultipla(tipo, conn):
     return conn.query(q).pop()[0]  # type: ignore
 
 
-def canCreate(tipoT, attrT, grafoT, relName, conn):
+def canCreate(tipoT: str, attrT: dict, grafoT, relName: str, conn: Connection)-> bool:
     """Capisce se la relazione tra le due entita' puo' essere creata. Quindi si chiede se tra le due e' gia' presente la relazione, se attiverebbe contraddizioni e cosi' via
 
     Args:
@@ -130,11 +131,11 @@ def canCreate(tipoT, attrT, grafoT, relName, conn):
     return True
 
 
-def getId(t, attr, g, conn):
+def getId(t: str, attr: dict, g, conn: Connection)->  int:
     """Ottiene l'ID dell'entita riconosciuta da attributi dati e nel grafo indicato. 
 
     Args:
-        t (_type_): tipo dell'entita'
+        t (str): tipo dell'entita'
         attr (dict): key-value attributes
         g (int o str): grafo
         conn (Connection): oggetto dedicato alla connessione a Neo4j
@@ -148,7 +149,7 @@ def getId(t, attr, g, conn):
     q += "}) RETURN id(e)"
     return conn.query(q)[0][0]  # type: ignore
 
-def create_relation_dir(typeES, ES_attr, gS, typeET, ET_attr, gT, relName, conn):
+def create_relation_dir(typeES: str, ES_attr: dict, gS, typeET: str, ET_attr: dict, gT, relName: str, conn: Connection)-> str: 
     """Crea, se possibile, una relazione tra l'entita' sorgente e quella destinazione, riconosciute tramite i parametri passati, con nome specificato
 
     Args:
@@ -187,7 +188,7 @@ def create_relation_dir(typeES, ES_attr, gS, typeET, ET_attr, gT, relName, conn)
                 return "RELAZIONE già presente/supera il limite"
 
 
-def addRelAttribute(conn, t, attribute):
+def addRelAttribute(conn: Connection, t: str, attribute: str):
     """Aggiunge un'attributo al metamodello di una relazione
 
     Args:
@@ -200,9 +201,9 @@ def addRelAttribute(conn, t, attribute):
 
             print(
                 "A new attribute named "
-                + str(attribute)
+                + attribute
                 + " will be added to relation type "
-                + str(t)
+                + t
                 + ". Continue?"
             )
             print("y - yes, n - no")
@@ -219,9 +220,9 @@ def addRelAttribute(conn, t, attribute):
                 if len(typeValues) == 1:
                     attrAlreadyPresent = tx.run(
                         "MATCH (instance:Relazione {type: 'relation', label:'"
-                        + str(t)
+                        + t
                         + "'}) -[rel:HAS]-> (attr:"
-                        + str(attribute)
+                        + attribute
                         + " {type: 'attr'}) RETURN instance, rel, attr"
                     )
                     attrPresentValues = attrAlreadyPresent.values()
@@ -229,28 +230,28 @@ def addRelAttribute(conn, t, attribute):
                     if len(attrPresentValues) == 0:
                         attrCreate = tx.run(
                             "MATCH (type:Relazione{type: 'relation', label:'"
-                            + str(t)
+                            + t
                             + "'}) CREATE (type) -[rel:HAS]-> (attr:"
-                            + str(attribute)
+                            + attribute
                             + " {label: '"
-                            + str(attribute)
+                            + attribute
                             + "', type: 'attr'}) RETURN type, rel, attr"
                         )
                         attrCreate.values()
 
                         print(
                             "Attribute "
-                            + str(attribute)
+                            + attribute
                             + " added to entity type "
-                            + str(t)
+                            + t
                         )
                     else:
-                        print("Attribute " + str(attribute) + " already present.")
+                        print("Attribute " + attribute + " already present.")
 
                 else:
                     print(
                         "Problem with relation type. Number of "
-                        + str(t)
+                        + t
                         + " type discovered: "
                         + str(len(typeValues))
                     )
@@ -258,7 +259,7 @@ def addRelAttribute(conn, t, attribute):
             elif flag == "n":
                 print("Operation aborted.")
 
-def alreadyExist(t1: str, t2: str, t: str, conn):
+def alreadyExist(t1: str, t2: str, t: str, conn: Connection)-> bool:
     """funzione di utility per vedere se due metamodelli sono gia' collegati da una relazione di tipo t
 
     Args:
@@ -286,7 +287,7 @@ def alreadyExist(t1: str, t2: str, t: str, conn):
 # Pre-condizioni:  relType1 e relType2 devono essere stringhe indicanti un tipo di relazioni presente nei metamodelli
 #                 relType deve essere una stringa che indica una relazione tra metamodelli (eg: CONTRADDITTORI)
 # Post-condizioni: True se la relazione non era pre esistente e la creazione ha avuto successo, False altrimenti
-def addConstraint(relType1: str, relType2: str, relType: str, conn):
+def addConstraint(relType1: str, relType2: str, relType: str, conn)-> bool:
     """Aggiunge un link, con nome specificato in relType, tra metamodelli (se non esiste gia')
 
     Args:
@@ -311,7 +312,7 @@ def addConstraint(relType1: str, relType2: str, relType: str, conn):
         return conn.query(q)[0][0]  # type: ignore
     return False
 
-def getContraddictory(par, t: int, conn):
+def getContraddictory(par, t: int, conn: Connection)-> list:
     """Ottiene relazioni contraddittorie
 
     Args:
@@ -346,7 +347,7 @@ def getContraddictory(par, t: int, conn):
 
     return l
 
-def srcCheck(entSrc: int, entDst: int, rel: str, conn):
+def srcCheck(entSrc: int, entDst: int, rel: str, conn: Connection)-> bool:
     """Controlla se esiste rel tra le due entita'
 
     Args:
@@ -370,7 +371,7 @@ def srcCheck(entSrc: int, entDst: int, rel: str, conn):
     return conn.query(q)[0][0]  # type: ignore
 
 
-def alreadyLinked(entSrc : int, entDst: int, rel: str, conn):
+def alreadyLinked(entSrc : int, entDst: int, rel: str, conn: Connection)-> bool:
     """Controlla se esiste rel tra le due entita'
 
     Args:
@@ -394,7 +395,7 @@ def alreadyLinked(entSrc : int, entDst: int, rel: str, conn):
     return conn.query(q)[0][0]  # type: ignore
 
 
-def checkInsertion(entSrc: int, entDst: int, rel: str, conn):
+def checkInsertion(entSrc: int, entDst: int, rel: str, conn: Connection)-> bool:
     """Controlla che non avvengano inserimenti contraddittori / non sia gia' presente
 
     Args:
@@ -421,15 +422,15 @@ def checkInsertion(entSrc: int, entDst: int, rel: str, conn):
 
 # funzione inserita in relationMatching per il controllo delle contraddizioni dirette/secche
 # i parametri sono i due tipi di relazione estratti dai for innestati, in caso l'uno compaia nella lista dell'altro e' contraddittorio
-def areDirectlyContraddictory(relType1, relType2, idR1, idR2, conn):
+def areDirectlyContraddictory(relType1, relType2, idR1, idR2, conn: Connection)-> bool:
     if sameSource(idR1, idR2, conn):
         g1 = getContraddictory(relType1, 1, conn)
         for el in g1:
             if el == relType2:
                 return True
-        return False
+    return False
 
-def create_relation_with_attribute(typeES, ES_attr, gS, typeET, ET_attr, gT, relName, relAttr, conn):
+def create_relation_with_attribute(typeES: str, ES_attr: dict, gS, typeET: str, ET_attr: dict, gT, relName: str, relAttr: dict, conn: Connection)-> str:
     """Crea, se possibile, una relazione tra l'entita' sorgente e quella destinazione, riconosciute tramite i parametri passati, con nome e con attributi specificati
 
     Args:
@@ -440,7 +441,7 @@ def create_relation_with_attribute(typeES, ES_attr, gS, typeET, ET_attr, gT, rel
         ET_attr (dict): key-value attributes destinazione
         gT (int or str): grafo destinazione
         relName (str): nome della relazione
-        relAttr (str): attributi associati alla relazione
+        relAttr (dict): attributi associati alla relazione
         conn (Connection): oggetto dedicato alla connessione a Neo4j
 
     Returns:
@@ -475,11 +476,11 @@ def create_relation_with_attribute(typeES, ES_attr, gS, typeET, ET_attr, gT, rel
 # @title Utility function per integrare (almeno) le relazioni con scadenza
 # per inserire relazioni con attributi devo ampliare la funzione pre-esistente, utilizzando overloading della vecchia funzione
 # per controllare se non e' scaduta e se puo' essere inserita o se considerarla in analisi
-def isOver(relID, conn):
+def isOver(relID, conn: Connection):
     q = "match () -[r]-> () where id(r) = " + str(relID) + " return r.scadenza"
     result = conn.query(q)
-    if (len(result) == 0):
+    if (len(result) == 0): # type: ignore
         raise Exception("RelationID {} non ha attributo scadenza".format(relID))
-    data = result.pop()[0]
+    data = result.pop()[0] # type: ignore
     print(data)
     return False

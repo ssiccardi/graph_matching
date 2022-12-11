@@ -1,4 +1,5 @@
 from Functions.Relation import getLimit, isSemiFissa
+from Functions.Connection import Connection
 
 def isNode(el):
     return str(type(el)) == "<class 'neo4j.graph.Node'>"
@@ -12,7 +13,7 @@ def whichGraph(g):
     raise Exception("Errore con variabile", g, " -- Valore non ammesso")
 
 
-def getAttr(ideng, g, conn):  
+def getAttr(ideng, g, conn: Connection):  
     """Ritorna una lista di chiavi valori con gli attributi
 
     Args:
@@ -45,7 +46,7 @@ def getAttr(ideng, g, conn):
     return dict(sorted(d.items()))  # ORA RITORNA UN DIZIONARIO
 
 
-def getIdenName(ideng, g, conn):
+def getIdenName(ideng, g, conn : Connection):
     """Ritorna una lista di attributi identitari
 
     Args:
@@ -65,7 +66,7 @@ def getIdenName(ideng, g, conn):
         + " return labels(p)"
     )
     result = conn.query(q)  # type: ignore
-    if len(result) == 0:
+    if len(result) == 0: # type: ignore
         return l
     res = result.pop()[0][0]  # type: ignore
     q = (
@@ -80,7 +81,7 @@ def getIdenName(ideng, g, conn):
     return l
 
 
-def canProceed(ideng, conn):
+def canProceed(ideng, conn: Connection):
     # PARTI DA PRESUPPOSTO entita' abbiano un codice identificativo e che quindi in input ci sia solo un ideng
     return conn.query("MATCH (e) WHERE e.id = " + str(ideng) + " RETURN COUNT(e) as ents")[0][0] == 2  # type: ignore
 
@@ -102,7 +103,7 @@ def removeAttr(attr, rem):
     for r in rem:
         attr.pop(r)
 
-def onlySemi(lista, conn):
+def onlySemi(lista, conn: Connection):
     """Filtra le relazioni non SemiFisse
 
     Args:
@@ -119,7 +120,7 @@ def onlySemi(lista, conn):
     return l
 
 
-def deleteSemi(lista, conn):
+def deleteSemi(lista, conn: Connection):
     """Filtra le relazioni SemiFisse
 
     Args:
@@ -137,7 +138,7 @@ def deleteSemi(lista, conn):
 
 
 # Dato id di entita', grafo e direzione delle relazioni (partenti/entranti) ritorna la lista delle relazioni semifisse ad essa collegate
-def getSemi(id, grafo, direzione, conn):
+def getSemi(id, grafo, direzione, conn: Connection):
     l = list()
     q = "MATCH "
     if direzione == 0:
@@ -171,7 +172,7 @@ def getSemi(id, grafo, direzione, conn):
 # @param(grafo) numero che indica in quale grafo prendere le relazioni
 # @param(direzione) numero che indica la direzione, 0 --> / 1 <--
 # return --> lista di relazioni direzionate da o per id nel grafo specificato
-def getRel(id, grafo, direzione, conn):
+def getRel(id, grafo, direzione: int, conn: Connection):
     l = list()
     q = "MATCH "
     if direzione == 0:
@@ -201,7 +202,7 @@ def getRel(id, grafo, direzione, conn):
     return deleteSemi(l, conn)
 
 
-def getDir(d):
+def getDir(d: int):
     if d == 0:
         return "(e) -[r]-> () "
     return "() -[r]-> (e) "
@@ -209,7 +210,7 @@ def getDir(d):
 
 # @param(r1, r2) id delle relazioni
 # return --> true se la relazione e' dello stesso tipo, nome e direzione, false altrimenti
-def sameRel(r1, r2, id, direzione, conn):
+def sameRel(r1, r2, id, direzione: int, conn: Connection):
     q = (
         "MATCH "
         + getDir(direzione)
@@ -230,7 +231,7 @@ def sameRel(r1, r2, id, direzione, conn):
 
 # @param(r1, r2) id delle relazioni
 # return --> true se la relazione ha la stessa entita' di arrivo, false altrimenti
-def sameTarget(r1, r2, conn):
+def sameTarget(r1, r2, conn: Connection):
     q = (
         "match () -[r]-> (e) where id(r) = "
         + str(r1)
@@ -243,7 +244,7 @@ def sameTarget(r1, r2, conn):
 
 # @param(r1, r2) id delle relazioni
 # return --> true se la relazione ha la stessa entita' di partenza, false altrimenti
-def sameSource(r1, r2, conn):
+def sameSource(r1, r2, conn: Connection):
     q = (
         "match (e) -[r]-> () where id(r) = "
         + str(r1)
@@ -255,7 +256,7 @@ def sameSource(r1, r2, conn):
 
 
 # crea stringhe dove segnali coincidenze o complementarità' se non sopra limite, contraddittorietà' altrimenti
-def overLimit(tipo, val, l1, l2, conn):
+def overLimit(tipo, val, l1, l2, conn: Connection):
     l = list()
     if val > getLimit(tipo, conn):
         l.append( # type: ignore

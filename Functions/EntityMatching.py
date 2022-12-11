@@ -5,9 +5,9 @@ from Functions.AlgorithmUtilities import (
     retrieveInfos,
     removeAttr
 )
+from Functions.Connection import Connection
 
-
-def entityMatching(ideng, conn):
+def entityMatching(ideng: int, conn: Connection):
     """Analizza due entita' e i loro attributi in due sottografi differenti
 
     Args:

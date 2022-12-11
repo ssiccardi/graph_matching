@@ -1,9 +1,9 @@
 import neo4j
 from Functions.DbUtilities import check_metamodello
-
+from Functions.Connection import Connection
 
 # @title PERSONA
-def metamodelloPersona(conn):
+def metamodelloPersona(conn: Connection):
     with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
         with session.begin_transaction() as tx:
             checkPresence = tx.run(
@@ -18,7 +18,7 @@ def metamodelloPersona(conn):
                 personSchemeNode = personScheme.single()
                 tx.run(
                     "MATCH (instance:Person), (n:Name), (s:Surname) WHERE id(instance) = $node_id CREATE (i:Identifier {label: 'iden'}) <- [:IDENTIFIED] - (instance), (i) - [:IDENTIFIED_BY] -> (n), (i) - [:IDENTIFIED_BY] -> (s)",
-                    node_id=personSchemeNode["node_id"],
+                    node_id=personSchemeNode["node_id"] # type: ignore
                 )
 
             else:
@@ -29,7 +29,7 @@ def metamodelloPersona(conn):
 
 
 # @title SOCIETÁ
-def metamodelloSocieta(conn):
+def metamodelloSocieta(conn: Connection):
     with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
         with session.begin_transaction() as tx:
 
@@ -50,7 +50,7 @@ def metamodelloSocieta(conn):
 
 
 # @title LUOGO
-def metamodelloLuogo(conn):
+def metamodelloLuogo(conn: Connection):
     with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
         with session.begin_transaction() as tx:
 
@@ -71,7 +71,7 @@ def metamodelloLuogo(conn):
 
 
 # @title INDIRIZZO
-def metamodelloIndirizzo(conn):
+def metamodelloIndirizzo(conn: Connection):
     with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
         with session.begin_transaction() as tx:
 
@@ -92,7 +92,7 @@ def metamodelloIndirizzo(conn):
 
 
 # AGGIUNGERE TIPI
-def addType(conn, t):
+def addType(conn: Connection, t: str):
     with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
         with session.begin_transaction() as tx:
 
@@ -126,7 +126,7 @@ def addType(conn, t):
 
 
 # AGGIUNGERE ATTRIBUTI
-def addAttribute(conn, t, attribute):
+def addAttribute(conn: Connection, t: str, attribute: str):
     with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
         with session.begin_transaction() as tx:
 
@@ -189,15 +189,15 @@ def addAttribute(conn, t, attribute):
 
 
 # AGGIUNTA IDENTIFICATORI:
-def addIdentifier(conn, t, attribute):
+def addIdentifier(conn: Connection, t: str, attribute: str):
     with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
         with session.begin_transaction() as tx:
 
             print(
                 "A new identifier node will be added to entity type "
-                + str(type)
+                + t
                 + " to attributes: "
-                + str(attribute)
+                + attribute
                 + ". Continue?"
             )
             print("y - yes, n - no")
@@ -205,7 +205,7 @@ def addIdentifier(conn, t, attribute):
 
             if flag == "y":
                 typePresence = tx.run(
-                    "MATCH (instance:" + str(t) + " {type: 'entity'}) RETURN instance"
+                    "MATCH (instance:" + t + " {type: 'entity'}) RETURN instance"
                 )
                 typeValues = typePresence.values()
 
@@ -216,12 +216,12 @@ def addIdentifier(conn, t, attribute):
                         if check_metamodello(conn, t, attr):
                             legal_attrs.append(attr)
                         else:
-                            print("Attribute " + str(attr) + " not found.")
+                            print("Attribute " + attr + " not found.")
 
                     if len(legal_attrs) > 0:
                         nodeToIden = tx.run(
                             "MATCH (instance:"
-                            + str(t)
+                            + t
                             + " {type: 'entity'}) CREATE (instance) - [rel:IDENTIFIED] -> (iden:Identifier {label: 'iden'}) RETURN id(iden) AS iden_id"
                         )
                         nodeToIden.single()
@@ -229,7 +229,7 @@ def addIdentifier(conn, t, attribute):
                         for attr in legal_attrs:
                             tx.run(
                                 "MATCH (iden:Identifier), (attr:"
-                                + str(attr)
+                                + attr
                                 + " {type: 'attr'}) CREATE (iden) - [rel:IDENTIFIED_BY] -> (attr) RETURN iden, rel, attr"
                             )
 
@@ -241,7 +241,7 @@ def addIdentifier(conn, t, attribute):
                 else:
                     print(
                         "Problem with entity type. Number of "
-                        + str(t)
+                        + t
                         + " type discovered: "
                         + str(len(typeValues))
                     )
@@ -250,13 +250,13 @@ def addIdentifier(conn, t, attribute):
                 print("Operation aborted")
 
 
-def relazione(conn, nome, riflessiva, card):
+def relazione(conn: Connection, nome: str, riflessiva: int, card):
     """Definisce un metamodello per una relazione
 
     Args:
         conn (Connection): oggetto dedicato alla connessione a Neo4j
         nome (str): nome della relazione
-        riflessiva (bool): per capire se la relazione e' bidirezionale
+        riflessiva (int): per capire se la relazione e' bidirezionale
         card (int or str): identifica il numero massimo con cui la relazione puo' essere utilizzata su una singola entita'
     """
     with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:

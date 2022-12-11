@@ -2,10 +2,11 @@ from neo4j import GraphDatabase
 
 class Connection:
 
-    def __init__(self, uri, user, password):
-        self.driver = GraphDatabase.driver(uri, auth=(user, password))
+    def __init__(self, uri: str, user: str, password: str):
+        gDB = GraphDatabase()
+        self.driver = gDB.driver(uri, auth=(user, password))
     
-    def query(self, query, db=None):
+    def query(self, query: str, db=None):
         """Permette di interrogare il database, senza controlli in input
 
         Args:
