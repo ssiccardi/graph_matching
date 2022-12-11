@@ -102,9 +102,7 @@ def addType(conn, t):
 
             if flag == "y":
                 alreadyPresent = tx.run(
-                    "MATCH (instance:"
-                    + str(t)
-                    + " {type: 'entity'}) RETURN instance"
+                    "MATCH (instance:" + str(t) + " {type: 'entity'}) RETURN instance"
                 )
                 alreadyPresentValues = alreadyPresent.values()
 
@@ -144,9 +142,7 @@ def addAttribute(conn, t, attribute):
 
             if flag == "y":
                 typePresence = tx.run(
-                    "MATCH (instance:"
-                    + str(t)
-                    + " {type: 'entity'}) RETURN instance"
+                    "MATCH (instance:" + str(t) + " {type: 'entity'}) RETURN instance"
                 )
                 typeValues = typePresence.values()
 
@@ -209,9 +205,7 @@ def addIdentifier(conn, t, attribute):
 
             if flag == "y":
                 typePresence = tx.run(
-                    "MATCH (instance:"
-                    + str(t)
-                    + " {type: 'entity'}) RETURN instance"
+                    "MATCH (instance:" + str(t) + " {type: 'entity'}) RETURN instance"
                 )
                 typeValues = typePresence.values()
 
@@ -254,3 +248,27 @@ def addIdentifier(conn, t, attribute):
 
             elif flag == "n":
                 print("Operation aborted")
+
+
+def relazione(conn, nome, riflessiva, card):
+    with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
+        with session.begin_transaction() as tx:
+            checkPresence = tx.run('Match (e) WHERE e.label = "' + nome + '" RETURN e')
+            checkPresenceValues = checkPresence.values()
+
+            if len(checkPresenceValues) == 0:
+                query = (
+                    "CREATE (instance:Relazione {label:'"
+                    + nome
+                    + "', type:'relation'}) - [:HAS] -> (:Cardinalita {label:'"
+                    + str(card)
+                    + "', type:'attr'}), (instance) - [:HAS] -> (:Riflessivita {label:'"
+                    + str(riflessiva)
+                    + "', type:'attr'}) RETURN id(instance) AS node_id"
+                )
+                tx.run(query)
+            else:
+                print("Metamodello relazione con nome [{}] già esistente!".format(nome))
+
+            tx.commit()
+            tx.close()
