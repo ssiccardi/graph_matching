@@ -251,6 +251,14 @@ def addIdentifier(conn, t, attribute):
 
 
 def relazione(conn, nome, riflessiva, card):
+    """Definisce un metamodello per una relazione
+
+    Args:
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+        nome (str): nome della relazione
+        riflessiva (bool): per capire se la relazione e' bidirezionale
+        card (int or str): identifica il numero massimo con cui la relazione puo' essere utilizzata su una singola entita'
+    """
     with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
         with session.begin_transaction() as tx:
             checkPresence = tx.run('Match (e) WHERE e.label = "' + nome + '" RETURN e')
