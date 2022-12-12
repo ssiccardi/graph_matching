@@ -153,6 +153,6 @@ def getEntityId(t: str, attr: dict, graph, conn: Connection)-> int:
         raise Exception("Errore nel trovare un ID per entita' di tipo {}, con attributi {}, nel grafo {}".format(t, attr, graph))
     
     if len(res) != 1: 
-        raise Exception("Questa entita' non e' unica, impossibile recuperare l'ID")
+        raise Exception("Questa entita' non e' unica, impossibile recuperare l'ID per entita' di tipo {}, con attributi {}, nel grafo {}\n\n{}".format(t, attr, graph, q))
     
     return res[0][0] 

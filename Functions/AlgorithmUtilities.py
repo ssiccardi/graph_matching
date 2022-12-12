@@ -240,13 +240,13 @@ def sameRel(r1, r2, id, direzione: int, conn: Connection):
         + str(r1)
         + " and e.id = "
         + str(id)
-        + " with r as ee match "
+        + " with r as rr match "
         + getDir(direzione)
         + " where id(r) = "
         + str(r2)
         + " and e.id = "
         + str(id)
-        + " return type(r) = type(ee)"
+        + " return type(r) = type(rr)"
     )
 
     res = conn.query(q)

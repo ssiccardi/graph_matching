@@ -18,6 +18,7 @@ create_instance_mine(conn, "Person", {"Name" : "Marilena", "Surname" : "Masolini
 create_instance_mine(conn, "Person", {"Name" : "zz", "Surname" : "zz"}, 1, 9)
 create_instance_mine(conn, "Person", {"Name" : "x", "Surname" : "x"}, 1, 10)
 create_instance_mine(conn, "Person", {"Name" : "Gioele", "Surname" : "Bellosi"}, 1, 11)
+create_instance_mine(conn, "Person", {"Name" : "Michela", "Surname" : "Scaramellini"}, 1, 12)
 
 #GRAFO 2:
 create_instance_mine(conn, "Person", {"Name" : "Pietro", "Surname" : "Masolini"}, 2, 1)

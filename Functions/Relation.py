@@ -407,7 +407,6 @@ def alreadyLinked(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool:
 
     return res[0][0] 
 
-
 def checkInsertion(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool:
     """Controlla che non avvengano inserimenti contraddittori / non sia gia' presente
 
@@ -463,11 +462,11 @@ def create_relation_dir(typeES: str, ES_attr: dict, gS, typeET: str, ET_attr: di
                 getEntityId(typeES, ES_attr, gS, conn),
                 getEntityId(typeET, ET_attr, gT, conn),
             )
-            if checkInsertion(
+            if not checkInsertion(
                 idSrc,
                 idDst,
                 relName,
-                conn,
+                conn
             ):
                 return "RELAZIONE in contraddizione diretta con un'altra pre esistente"
             elif canCreate(idDst, relName, conn):
@@ -509,7 +508,7 @@ def create_relation_with_attribute(typeES: str, ES_attr: dict, gS, typeET: str, 
                 getEntityId(typeES, ES_attr, gS, conn),
                 getEntityId(typeET, ET_attr, gT, conn),
             )
-            if checkInsertion(
+            if not checkInsertion(
                 idSrc,
                 idDst,
                 relName,
@@ -524,10 +523,10 @@ def create_relation_with_attribute(typeES: str, ES_attr: dict, gS, typeET: str, 
                     + str(idSrc)
                     + " CREATE (eS) -[r:"
                     + relName
-                    + "{"
+                    + " {"
                 )
                 for el in relAttr.items():
-                    q += el[0] + ': "' + el[1] + ", "
+                    q += el[0] + ': "' + el[1] + '", '
                 q = q[:-2]
                 q += " }]-> (eT)"
                 tx.run(q)
@@ -556,6 +555,10 @@ def isOver(relID, conn: Connection):
         raise Exception("RelationID {} non ha attributo scadenza".format(relID))
 
     data = result.pop()[0]  
+
+    if data == None:
+        return False
+
     data = data.split(data[2:3])
 
     return date(int(data[2]), int(data[1]), int(data[0])) < date.today()

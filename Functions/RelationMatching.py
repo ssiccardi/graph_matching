@@ -5,6 +5,7 @@ from Functions.Connection import Connection
 
 ##TODO: Controllo relazioni secche funziona?
 ##TODO: Controllo relazioni scadenza funziona?
+##TODO: Amplia gli attributi che prendi con le get e togli confronti evitabili tramite interrogazione DB, tipo sameTarget
 
 def getInfoSemi(id: int, conn: Connection):
     """Analizza le relazioni SemiFisse legate all'id passato in input, mostrando all'utente cosa nota
@@ -38,7 +39,7 @@ def getInfoSemi(id: int, conn: Connection):
             print("Relazione complementare in G1 di tipo {} con entità di partenza id:{} e entità di arrivo id:{}".format(r1.get("tipo"), r1.get("da"), r1.get("a")))  
             typeBucket[r1.get("tipo")] += 1
         b = True
-    for el in relE2:  # incremento mancante!
+    for el in relE2:  
         if not len(toRem):
             typeBucket[el.get("tipo")] += 1
             print("Relazione complementare in G2 di tipo {} con entità di partenza id:{} e entità di arrivo id:{}".format(el.get("tipo"), el.get("da"), el.get("a")))  
@@ -50,7 +51,7 @@ def getInfoSemi(id: int, conn: Connection):
             if not b:
                 typeBucket[el.get("tipo")] += 1
                 print("Relazione complementare in G2 di tipo {} con entità di partenza id:{} e entità di arrivo id:{}".format(el.get("tipo"), el.get("da"), el.get("a"))) 
-    # RIVEDI METODO // PENSA A RIDUZIONE TEMPO A SCAPITO DI SPAZIO
+    
     for t in typeBucket.keys():
         print("Relazione semifissa {} -- {}".format(t, overLimit(t, typeBucket.get(t), relE1, relE2, conn)))
 
@@ -122,7 +123,6 @@ def relationMatching(id: int, conn: Connection):
                 print("Complementare -->", rel)  # COMPLEMENTARE
 
     # ENTRANTI:
-    # inserire controllo relazioni contraddittorie tra i due grafi
     toRem = list()
 
     for rel1 in relE1:
