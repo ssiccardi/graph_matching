@@ -96,9 +96,37 @@ def isMultipla(tipo: str, conn: Connection) -> bool:
     )
     return conn.query(q).pop()[0]  # type: ignore
 
+def getScadute(idDst, relName: str, conn: Connection)-> int:
+    """Conta il numero di relazioni di tipo indicato, che arrivano all'entita' indicata, sono scadute
 
-def canCreate(idDst, relName: str, conn: Connection) -> bool:
-    # TODO
+    Args:
+        idDst (str or int): ID dell'entita' di destinazione
+        relName (str): tipo di relazione
+        conn (Connection): oggetto dedicato alla connessione a Neo
+
+    Returns:
+        int: numero di relazioni di tipo relName scadute ed indirizzate ad idDst
+    """
+    tot = 0
+    q = (
+            "MATCH () -[r:"
+            + relName
+            + "]-> (e) WHERE id(e) = "
+            + str(idDst)
+            + " return id(r)"
+        )
+    res = conn.query(q)
+
+    if res == None:
+        return 0
+    
+    while len(res) > 0: 
+        if isOver(res.pop()[0], conn):
+            tot += 1
+    
+    return tot
+
+def canCreate(idDst, relName: str, conn: Connection, scadenza = None) -> bool:
     """Capisce se la relazione tra le due entita' puo' essere creata. Quindi si chiede se tra le due e' gia' presente la relazione, se attiverebbe contraddizioni e cosi' via
 
     Args:
@@ -109,6 +137,10 @@ def canCreate(idDst, relName: str, conn: Connection) -> bool:
     Returns:
         bool: True se passa tutti i controlli, False altrimenti
     """
+    if scadenza is not None:
+        scadenza = scadenza.split(scadenza[2:3])
+        if date(int(scadenza[2]), int(scadenza[1]), int(scadenza[0])) < date.today():
+            return True
     if not isMultipla(relName, conn):
         q = (
             "MATCH () -[r:"
@@ -119,9 +151,9 @@ def canCreate(idDst, relName: str, conn: Connection) -> bool:
         )
 
         if isFissa(relName, conn):
-            q += " = 1"
+            q += " = " + str(1 + getScadute(idDst, relName, conn))
         else:
-            q += " = " + str(getLimit(relName, conn))
+            q += " = " + str(getLimit(relName, conn) + getScadute(idDst, relName, conn))
 
         res = conn.query(q)
 
@@ -348,11 +380,7 @@ def checkInsertion(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool
     presentContr = getContraddictory(rel, 1, conn)
     # ottengo tutte le relazioni in contraddizioni con quella da inserire
 
-    for (
-        p
-    ) in (
-        presentContr
-    ):  # si controlla se nell'entita' sorgente e' presente questa relazione in contraddizione con quella da inserire
+    for p in presentContr:  # si controlla se nell'entita' sorgente e' presente questa relazione in contraddizione con quella da inserire
         if alreadyLinked(entSrc, entDst, p, conn):
             return False
 
@@ -366,27 +394,6 @@ def areDirectlyContraddictory(relType1, relType2, idR1, idR2, conn: Connection) 
             if el == relType2:
                 return True
     return False
-
-
-def checkScadenza(idSrc, idDst, relName: str, conn: Connection, scadenza=None):
-    """Controlla se la relazione da inserire non si sovrapponga ad un altra non ancora scaduta
-
-    Args:
-        idSrc (int or str): id dell'entita' sorgente
-        idDst (int or str): id dell'entita' destinazione
-        relName (str): nome della relazione
-        conn (Connection): oggetto dedicato alla connessione a Neo4j
-        scadenza (str, optional): Valore della scadenza. Defaults to None.
-
-    Returns:
-        bool: True se inseribili, False altrimenti
-    """
-    if scadenza is None:
-        pass
-    else:
-        pass
-    return True
-
 
 def create_relation_dir(typeES: str, ES_attr: dict, gS, typeET: str, ET_attr: dict, gT, relName: str, conn: Connection) -> str:
     """Crea, se possibile, una relazione tra l'entita' sorgente e quella destinazione, riconosciute tramite i parametri passati, con nome specificato
@@ -417,8 +424,6 @@ def create_relation_dir(typeES: str, ES_attr: dict, gS, typeET: str, ET_attr: di
                 conn,
             ):
                 return "RELAZIONE in contraddizione diretta con un'altra pre esistente"
-            elif checkScadenza(idSrc, idDst, relName, conn):
-                return "RELAZIONE in contraddizione con una relazione non ancora scaduta"
             elif canCreate(idDst, relName, conn):
                 q = (
                     "MATCH (eT) WHERE id(eT) = "
@@ -465,9 +470,7 @@ def create_relation_with_attribute(typeES: str, ES_attr: dict, gS, typeET: str, 
                 conn,
             ):
                 return "RELAZIONE in contraddizione diretta con un'altra pre esistente"
-            elif checkScadenza(idSrc, idDst, relName, conn, relAttr["scadenza"]):
-                return "RELAZIONE in contraddizione con una relazione non ancora scaduta"
-            elif canCreate(idDst, relName, conn):
+            elif canCreate(idDst, relName, conn, relAttr["scadenza"]):
                 q = (
                     "MATCH (eT) WHERE id(eT) = "
                     + str(idDst)
@@ -485,7 +488,6 @@ def create_relation_with_attribute(typeES: str, ES_attr: dict, gS, typeET: str, 
                 return "OK"
             else:
                 return "RELAZIONE già presente/supera il limite"
-
 
 def isOver(relID, conn: Connection):
     """Controlla se la relazione e' scaduta

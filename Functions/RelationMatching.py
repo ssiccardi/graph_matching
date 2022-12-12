@@ -10,12 +10,8 @@ def getInfoSemi(id: int, conn: Connection):
         id (int): id appartenente all'entita' da analizzare\n
         conn (Connection): oggetto dedicato alla connessione a Neo4j
     """
-    relP1, relP2 = getSemi(id, 1, 0, conn), getSemi(
-        id, 2, 0, conn
-    )  # zero analisi da fare qui
-    relE1, relE2 = getSemi(id, 1, 1, conn), getSemi(
-        id, 2, 1, conn
-    )  # le analisi si fanno qui
+    relP1, relP2 = getSemi(id, 1, 0, conn), getSemi(id, 2, 0, conn)  # zero analisi da fare qui
+    relE1, relE2 = getSemi(id, 1, 1, conn), getSemi(id, 2, 1, conn)  # le analisi si fanno qui
 
     # Parte entranti:
     typeBucket = createTypeBucket(relE1, relE2)
@@ -23,23 +19,13 @@ def getInfoSemi(id: int, conn: Connection):
     b = True
     for r1 in relE1:
         for r2 in relE2:
-            if areDirectlyContraddictory(
-                r1.get("tipo"), r2.get("tipo"), r1.get("id"), r2.get("id"), conn
-            ):
-                print(
-                    "Contraddittoria DIRETTA [{}] - [{}]".format(r1, r2)
-                )  # CONTRADDITTORIA
+            if areDirectlyContraddictory(r1.get("tipo"), r2.get("tipo"), r1.get("id"), r2.get("id"), conn):
+                print("Contraddittoria DIRETTA [{}] - [{}]".format(r1, r2))  # CONTRADDITTORIA
                 toRem.append(r2.get("id"))
                 # b = False
                 # break #ora tolti
-            if sameRel(r1.get("id"), r2.get("id"), id, 1, conn) and sameSource(
-                r1.get("id"), r2.get("id"), conn
-            ):  # capisci se si può fare lo stesso usando le info disponibili in relE1 e relE2 (tipo e1.get('da') == ...)
-                print(
-                    "Relazione coincidente in G1 di tipo {} con entità di partenza id:{} e entità di arrivo id:{}".format(
-                        r1.get("tipo"), r1.get("da"), r1.get("a")
-                    )
-                )
+            if sameRel(r1.get("id"), r2.get("id"), id, 1, conn) and sameSource(r1.get("id"), r2.get("id"), conn):  # capisci se si può fare lo stesso usando le info disponibili in relE1 e relE2 (tipo e1.get('da') == ...)
+                print("Relazione coincidente in G1 di tipo {} con entità di partenza id:{} e entità di arrivo id:{}".format(r1.get("tipo"), r1.get("da"), r1.get("a")))
                 typeBucket[r1.get("tipo")] += 1
                 b = False
                 toRem.append(r2.get("id"))
@@ -74,9 +60,7 @@ def getInfoSemi(id: int, conn: Connection):
     b = True
     for r1 in relP1:
         for r2 in relP2:
-            if sameRel(r1.get("id"), r2.get("id"), id, 0, conn) and sameTarget(
-                r1.get("id"), r2.get("id"), conn
-            ):  # capisci se si può fare lo stesso usando le info disponibili in relE1 e relE2 (tipo e1.get('da') == ...)
+            if sameRel(r1.get("id"), r2.get("id"), id, 0, conn) and sameTarget(r1.get("id"), r2.get("id"), conn):  # capisci se si può fare lo stesso usando le info disponibili in relE1 e relE2 (tipo e1.get('da') == ...)
                 print("Relazione coincidente in G1 di tipo {} con entità di partenza id:{} e entità di arrivo id:{}".format(r1.get("tipo"), r1.get("da"), r1.get("a")))  # type: ignore
                 b = False
                 toRem.append(r2.get("id"))
@@ -104,7 +88,7 @@ def relationMatching(id: int, conn: Connection):
         2)Le relazioni fisse hanno subito un controllo in inserimento, non ci possono essere piu' relazioni fisse uguali appartenenti alla stessa entita' di uno stesso grafo\n
         3)Le relazioni semifisse hanno subito lo stesso controllo in inserimento!\n
     Args:
-        id (int): [id appartente all'entita' da analizzare]\n
+        id (int): [id appartenente all'entita' da analizzare]\n
         conn (Connection): [oggetto dedicato alla connessione a Neo4j]
     """    
     relP1, relP2 = getRel(id, 1, 0, conn), getRel(id, 2, 0, conn)
@@ -144,12 +128,8 @@ def relationMatching(id: int, conn: Connection):
 
     for rel1 in relE1:
         for rel2 in relE2:
-            if areDirectlyContraddictory(
-                rel1.get("tipo"), rel2.get("tipo"), rel1.get("id"), rel2.get("id"), conn
-            ):
-                print(
-                    "Contraddittoria DIRETTA [{}] - [{}]".format(rel1, rel2)
-                )  # CONTRADDITTORIA
+            if areDirectlyContraddictory(rel1.get("tipo"), rel2.get("tipo"), rel1.get("id"), rel2.get("id"), conn):
+                print("Contraddittoria DIRETTA [{}] - [{}]".format(rel1, rel2))  # CONTRADDITTORIA
                 toRem.append(rel2.get("id"))
                 # compl = None
                 # break #Per ora tolti
@@ -161,9 +141,7 @@ def relationMatching(id: int, conn: Connection):
                     break
                 else:
                     if isFissa(rel1.get("tipo"), conn):
-                        print(
-                            "Contraddittoria [{}] - [{}]".format(rel1, rel2)
-                        )  # CONTRADDITTORIA
+                        print("Contraddittoria [{}] - [{}]".format(rel1, rel2))  # CONTRADDITTORIA
                         toRem.append(rel2.get("id"))
                         compl = None
                         break

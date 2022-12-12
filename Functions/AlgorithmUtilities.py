@@ -4,7 +4,6 @@ from Functions.Connection import Connection
 def isNode(el):
     return str(type(el)) == "<class 'neo4j.graph.Node'>"
 
-
 def whichGraph(g):
     if g == "G1":
         return "p.graph = 1 and "
