@@ -127,3 +127,28 @@ def get_identifiable_attributes(conn: Connection, t: str):
             tx.close()
 
     return identifiable_attributes
+
+def getEntityId(t: str, attr: dict, graph, conn: Connection)-> int:
+    """Ottieni l'ID automatico dato da Neo4j al momento dell'inserimento
+
+    Args:
+        t (str): tipo dell'entita'
+        attr (dict): key-value attributes
+        graph (str or int): identificatore grafo di appartenenza 
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Raises:
+        Exception: quando troviamo piu' entita' con stessi parametri
+
+    Returns:
+        int: ID entita' riconosciuta dai parametri
+    """    
+    q = "MATCH (e:" + t + " { graph:" + str(graph)
+    for el in attr.items():
+        q += ", " + el[0] + ': "' + el[1] + '"'
+    q += "}) return id(e)"
+    res = conn.query(q) # type: ignore
+    if len(res) != 1: # type: ignore
+        raise Exception("Questa entita' non e' unica, impossibile recuperare l'ID")
+    
+    return res[0][0] # type: ignore

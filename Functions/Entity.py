@@ -39,7 +39,7 @@ def create_instance_mine(conn: Connection, t, attributes, graph, id):
             else:
                 print("Instance already present and uniquely")
 
-                if check_instance(conn, type, attributes):
+                if check_instance(conn, t, attributes):
                     instance_query = tx.run(
                         "MATCH (instance:"
                         + str(t)
@@ -53,7 +53,7 @@ def create_instance_mine(conn: Connection, t, attributes, graph, id):
             tx.commit()
             tx.close()
             
-def delete_instance(conn: Connection, t: str, attributes):
+def delete_instance(conn: Connection, t: str, attributes: dict):
     """Elimina un'entita' con attributi dati e di tipologia data. IN ENTRAMBI I GRAFI
 
     Args:
@@ -64,21 +64,40 @@ def delete_instance(conn: Connection, t: str, attributes):
     Returns:
         void: 
     """    
-    legal_attr = legal_attributes(conn, type, attributes)
+    legal_attr = legal_attributes(conn, t, attributes)
 
     with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
         with session.begin_transaction() as tx:
-            if check_instance(conn, t, attributes):
+            if check_instance(conn, str(t), attributes):
                 print("Uniquely identified instance")
                 tx.run(
                     "MATCH (instance:"
-                    + t
+                    + str(t)
                     + " {"
                     + stringify_attributes(legal_attr)
                     + "}) DETACH DELETE instance"
                 )
-
                 print("Instance deleted")
+            tx.commit()
+            tx.close()
 
+def delete_instance_id(conn: Connection, id: int):
+    """Elimina un'entita' con attributi dati e di tipologia data. IN ENTRAMBI I GRAFI
+
+    Args:
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+        id (int): ID univoco dell'entita'
+
+    Returns:
+        void: 
+    """    
+    with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
+        with session.begin_transaction() as tx:
+            tx.run(
+                "MATCH (instance) WHERE id(instance) = "
+                + str(id)
+                + " DELETE instance"
+            )
+            print("Instance deleted")
             tx.commit()
             tx.close()
