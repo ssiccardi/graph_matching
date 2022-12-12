@@ -2,7 +2,7 @@
 
 Con il caso di studio:
 
-![](/home/pietro/Downloads/graph.png)
+![](../Contents/graph.png)
 
 Abbiamo i seguenti problemi:
 
