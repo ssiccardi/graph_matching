@@ -147,8 +147,12 @@ def getEntityId(t: str, attr: dict, graph, conn: Connection)-> int:
     for el in attr.items():
         q += ", " + el[0] + ': "' + el[1] + '"'
     q += "}) return id(e)"
-    res = conn.query(q) # type: ignore
-    if len(res) != 1: # type: ignore
+    res = conn.query(q) 
+    
+    if res is None:
+        raise Exception("Errore nel trovare un ID per entita' di tipo {}, con attributi {}, nel grafo {}".format(t, attr, graph))
+    
+    if len(res) != 1: 
         raise Exception("Questa entita' non e' unica, impossibile recuperare l'ID")
     
-    return res[0][0] # type: ignore
+    return res[0][0] 

@@ -3,6 +3,9 @@ from Functions.AlgorithmUtilities import createTypeBucket, getRel, getSemi, over
 from Functions.Relation import areDirectlyContraddictory, isFissa
 from Functions.Connection import Connection
 
+##TODO: Controllo relazioni secche funziona?
+##TODO: Controllo relazioni scadenza funziona?
+
 def getInfoSemi(id: int, conn: Connection):
     """Analizza le relazioni SemiFisse legate all'id passato in input, mostrando all'utente cosa nota
 
@@ -32,13 +35,13 @@ def getInfoSemi(id: int, conn: Connection):
                 break
         if b:
             # COMPLEMENTARI
-            print("Relazione complementare in G1 di tipo {} con entità di partenza id:{} e entità di arrivo id:{}".format(r1.get("tipo"), r1.get("da"), r1.get("a")))  # type: ignore
+            print("Relazione complementare in G1 di tipo {} con entità di partenza id:{} e entità di arrivo id:{}".format(r1.get("tipo"), r1.get("da"), r1.get("a")))  
             typeBucket[r1.get("tipo")] += 1
         b = True
     for el in relE2:  # incremento mancante!
         if not len(toRem):
             typeBucket[el.get("tipo")] += 1
-            print("Relazione complementare in G2 di tipo {} con entità di partenza id:{} e entità di arrivo id:{}".format(r1.get("tipo"), r1.get("da"), r1.get("a")))  # type: ignore
+            print("Relazione complementare in G2 di tipo {} con entità di partenza id:{} e entità di arrivo id:{}".format(el.get("tipo"), el.get("da"), el.get("a")))  
         else:
             b = False
             for id in toRem:
@@ -46,14 +49,10 @@ def getInfoSemi(id: int, conn: Connection):
                     b = True
             if not b:
                 typeBucket[el.get("tipo")] += 1
-                print("Relazione complementare in G2 di tipo {} con entità di partenza id:{} e entità di arrivo id:{}".format(r1.get("tipo"), r1.get("da"), r1.get("a")))  # type: ignore
+                print("Relazione complementare in G2 di tipo {} con entità di partenza id:{} e entità di arrivo id:{}".format(el.get("tipo"), el.get("da"), el.get("a"))) 
     # RIVEDI METODO // PENSA A RIDUZIONE TEMPO A SCAPITO DI SPAZIO
     for t in typeBucket.keys():
-        print(
-            "Relazione semifissa {} -- {}".format(
-                t, overLimit(t, typeBucket.get(t), relE1, relE2, conn)
-            )
-        )
+        print("Relazione semifissa {} -- {}".format(t, overLimit(t, typeBucket.get(t), relE1, relE2, conn)))
 
     # Parte partenti:
     toRem = list()
@@ -61,24 +60,24 @@ def getInfoSemi(id: int, conn: Connection):
     for r1 in relP1:
         for r2 in relP2:
             if sameRel(r1.get("id"), r2.get("id"), id, 0, conn) and sameTarget(r1.get("id"), r2.get("id"), conn):  # capisci se si può fare lo stesso usando le info disponibili in relE1 e relE2 (tipo e1.get('da') == ...)
-                print("Relazione coincidente in G1 di tipo {} con entità di partenza id:{} e entità di arrivo id:{}".format(r1.get("tipo"), r1.get("da"), r1.get("a")))  # type: ignore
+                print("Relazione coincidente in G1 di tipo {} con entità di partenza id:{} e entità di arrivo id:{}".format(r1.get("tipo"), r1.get("da"), r1.get("a"))) 
                 b = False
                 toRem.append(r2.get("id"))
                 break
         if b:
-            print("Relazione complementare in G1 di tipo {} con entità di partenza id:{} e entità di arrivo id:{}".format(r1.get("tipo"), r1.get("da"), r1.get("a")))  # type: ignore
+            print("Relazione complementare in G1 di tipo {} con entità di partenza id:{} e entità di arrivo id:{}".format(r1.get("tipo"), r1.get("da"), r1.get("a")))  
         b = True
 
     for el in relP2:
         if not len(toRem):
-            print("Relazione complementare in G2 di tipo {} con entità di partenza id:{} e entità di arrivo id:{}".format(r1.get("tipo"), r1.get("da"), r1.get("a")))  # type: ignore
+            print("Relazione complementare in G2 di tipo {} con entità di partenza id:{} e entità di arrivo id:{}".format(el.get("tipo"), el.get("da"), el.get("a")))
         else:
             b = False
             for id in toRem:
                 if id == el.get("id"):
                     b = True
             if not b:
-                print("Relazione complementare in G2 di tipo {} con entità di partenza id:{} e entità di arrivo id:{}".format(el.get("tipo"), el.get("da"), el.get("a")))  # type: ignore
+                print("Relazione complementare in G2 di tipo {} con entità di partenza id:{} e entità di arrivo id:{}".format(el.get("tipo"), el.get("da"), el.get("a"))) 
 
 
 def relationMatching(id: int, conn: Connection):

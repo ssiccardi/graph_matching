@@ -22,14 +22,17 @@ def sameSource(r1, r2, conn: Connection) -> bool:
         + str(r2)
         + " return e.id = id1"
     )
-    return conn.query(q).pop()[0]  # type: ignore
+    res = conn.query(q)
+    if res == None:
+        raise Exception("Errore tra {} e {}".format(r1, r2))
+    return res.pop()[0] 
 
 
-def getLimit(tipo: str, conn: Connection) -> int:
+def getLimit(t: str, conn: Connection) -> int:
     """Ottiene la Cardinalita per una relazione semifissa
 
     Args:
-        tipo (str): nome della relazione
+        t (str): nome della relazione
         conn (Connectio): oggetto dedicato alla connessione a Neo4j
 
     Returns:
@@ -37,17 +40,20 @@ def getLimit(tipo: str, conn: Connection) -> int:
     """
     q = (
         "MATCH (e) -[:HAS]-> (ee) WHERE e.label ='"
-        + tipo
+        + t
         + "' and labels(ee)[0] = 'Cardinalita' return properties(ee).label"
     )
-    return int(conn.query(q).pop()[0])  # type: ignore
+    res = conn.query(q)
+    if res == None:
+        raise Exception("Errore per relazione di tipo {}".format(t))
+    return int(res.pop()[0])
 
 
-def isSemiFissa(tipo: str, conn: Connection) -> bool:
+def isSemiFissa(t: str, conn: Connection) -> bool:
     """Capisce se la relazione e' di tipo SemiFisso
 
     Args:
-        tipo (str): nome della relazione
+        t (str): nome della relazione
         conn (Connection): oggetto dedicato alla connessione a Neo4j
 
     Returns:
@@ -55,17 +61,21 @@ def isSemiFissa(tipo: str, conn: Connection) -> bool:
     """
     q = (
         "match (e) -[:HAS]-> (something) where e.label = '"
-        + tipo
+        + t
         + "' and labels(something)[0] = 'Cardinalita' return something.label <> '1' and something.label <> 'n'"
     )
-    return conn.query(q).pop()[0]  # type: ignore
+    
+    res = conn.query(q)
+    if res == None:
+        raise Exception("Errore per relazione di tipo {}".format(t))
+    return res.pop()[0]  
 
 
-def isFissa(tipo: str, conn: Connection) -> bool:
+def isFissa(t: str, conn: Connection) -> bool:
     """Capisce se la relazione e' di tipo Fisso
 
     Args:
-        tipo (str): nome della relazione
+        t (str): nome della relazione
         conn (Connection): oggetto dedicato alla connessione a Neo4j
 
     Returns:
@@ -73,17 +83,20 @@ def isFissa(tipo: str, conn: Connection) -> bool:
     """
     q = (
         "match (e) -[:HAS]-> (something) where e.label = '"
-        + tipo
+        + t
         + "' and labels(something)[0] = 'Cardinalita' return something.label = '1'"
     )
-    return conn.query(q).pop()[0]  # type: ignore
+    res = conn.query(q)
+    if res == None:
+        raise Exception("Errore per relazione di tipo {}".format(t))
+    return res.pop()[0]
 
 
-def isMultipla(tipo: str, conn: Connection) -> bool:
+def isMultipla(t: str, conn: Connection) -> bool:
     """Capisce se la relazione e' di tipo Multiplo
 
     Args:
-        tipo (str): nome della relazione
+        t (str): nome della relazione
         conn (Connection): oggetto dedicato alla connessione a Neo4j
 
     Returns:
@@ -91,10 +104,13 @@ def isMultipla(tipo: str, conn: Connection) -> bool:
     """
     q = (
         "match (e) -[:HAS]-> (something) where e.label = '"
-        + tipo
+        + t
         + "' and labels(something)[0] = 'Cardinalita' return something.label = 'n'"
     )
-    return conn.query(q).pop()[0]  # type: ignore
+    res = conn.query(q)
+    if res == None:
+        raise Exception("Errore per relazione di tipo {}".format(t))
+    return res.pop()[0]  
 
 def getScadute(idDst, relName: str, conn: Connection)-> int:
     """Conta il numero di relazioni di tipo indicato, che arrivano all'entita' indicata, sono scadute
@@ -157,7 +173,10 @@ def canCreate(idDst, relName: str, conn: Connection, scadenza = None) -> bool:
 
         res = conn.query(q)
 
-        return not res[0][0]  # type: ignore
+        if res == None:
+            raise Exception("Errore con entita' {} e relazione di tipo {}".format(idDst, relName))
+
+        return not res[0][0] 
     return True
 
 
@@ -249,7 +268,12 @@ def alreadyExist(t1: str, t2: str, t: str, conn: Connection) -> bool:
         + t
         + "]- (t2) return count(r) = 1"
     )
-    return conn.query(q)[0][0]  # type: ignore
+    res = conn.query(q)
+
+    if res == None:
+        raise Exception("Errore tra metamodello {} e {} con nuova relazione {}".format(t1, t2, t))
+
+    return res[0][0]  
 
 
 def addConstraint(relType1: str, relType2: str, relType: str, conn) -> bool:
@@ -274,7 +298,13 @@ def addConstraint(relType1: str, relType2: str, relType: str, conn) -> bool:
             + relType
             + "]-> (t2) return count(r) = 1"
         )
-        return conn.query(q)[0][0]  # type: ignore
+
+        res = conn.query(q)
+
+        if res == None:
+            raise Exception("Errore tra metamodello {} e {} con nuova relazione {}".format(relType1, relType2, relType))
+
+        return res[0][0]  
     return False
 
 
@@ -307,9 +337,13 @@ def getContraddictory(par, t: int, conn: Connection) -> list:
     else:
         raise ValueError("Parametro t non corrisponde a nessuna possibile opzione:", t)
     res = conn.query(q)
+
+    if res == None:
+        raise Exception("Errore con" + par)
+
     l = list()
-    while len(res) > 0:  # type: ignore
-        l.append(res.pop().get("tipo"))  # type: ignore
+    while len(res) > 0:  
+        l.append(res.pop().get("tipo"))  
 
     return l
 
@@ -335,7 +369,13 @@ def srcCheck(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool:
         + str(entDst)
         + " return count(r) > 0"
     )
-    return conn.query(q)[0][0]  # type: ignore
+
+    res = conn.query(q)
+
+    if res == None:
+        raise Exception("Errore con entita' sorgente {}, destinazione {} e relazione {}".format(entSrc, entDst, rel))
+
+    return res[0][0] 
 
 
 def alreadyLinked(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool:
@@ -359,7 +399,13 @@ def alreadyLinked(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool:
         + str(entDst)
         + " return count(r) > 0"
     )
-    return conn.query(q)[0][0]  # type: ignore
+    
+    res = conn.query(q)
+
+    if res == None:
+        raise Exception("Errore con entita' sorgente {}, destinazione {} e relazione {}".format(entSrc, entDst, rel))
+
+    return res[0][0] 
 
 
 def checkInsertion(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool:
@@ -411,7 +457,7 @@ def create_relation_dir(typeES: str, ES_attr: dict, gS, typeET: str, ET_attr: di
     Returns:
         str: OK se non ci sono errori
     """
-    with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:  # type: ignore
+    with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:  
         with session.begin_transaction() as tx:
             idSrc, idDst = (
                 getEntityId(typeES, ES_attr, gS, conn),
@@ -457,7 +503,7 @@ def create_relation_with_attribute(typeES: str, ES_attr: dict, gS, typeET: str, 
     Returns:
         str: OK se non ci sono errori
     """
-    with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:  # type: ignore
+    with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:  
         with session.begin_transaction() as tx:
             idSrc, idDst = (
                 getEntityId(typeES, ES_attr, gS, conn),
@@ -506,10 +552,10 @@ def isOver(relID, conn: Connection):
 
     result = conn.query(q)
 
-    if len(result) == 0:  # type: ignore
+    if result == None or len(result) == 0:  
         raise Exception("RelationID {} non ha attributo scadenza".format(relID))
 
-    data = result.pop()[0]  # type: ignore
+    data = result.pop()[0]  
     data = data.split(data[2:3])
 
     return date(int(data[2]), int(data[1]), int(data[0])) < date.today()

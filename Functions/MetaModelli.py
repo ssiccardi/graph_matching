@@ -16,9 +16,13 @@ def metamodelloPersona(conn: Connection):
                     "CREATE (instance:Person {label: 'Person', type: 'entity'}) - [:HAS] -> (:Name {label: 'Name', type: 'attr'}), (instance) - [:HAS] -> (:Surname {label: 'Surname', type: 'attr'}) RETURN id(instance) AS node_id"
                 )
                 personSchemeNode = personScheme.single()
+
+                if personSchemeNode is None:
+                    raise Exception("Errore con personScheme.single()")
+                    
                 tx.run(
                     "MATCH (instance:Person), (n:Name), (s:Surname) WHERE id(instance) = $node_id CREATE (i:Identifier {label: 'iden'}) <- [:IDENTIFIED] - (instance), (i) - [:IDENTIFIED_BY] -> (n), (i) - [:IDENTIFIED_BY] -> (s)",
-                    node_id=personSchemeNode["node_id"] # type: ignore
+                    node_id=personSchemeNode["node_id"] 
                 )
 
             else:

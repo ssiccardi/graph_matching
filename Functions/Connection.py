@@ -4,8 +4,8 @@ class Connection:
 
     def __init__(self, uri: str, user: str, password: str):
         gDB = GraphDatabase()
-        self.driver = gDB.driver(uri, auth=(user, password))
-    
+        self.driver = gDB.driver(uri, auth=(user, password))# type: ignore
+            
     def query(self, query: str, db=None):
         """Permette di interrogare il database, senza controlli in input
 

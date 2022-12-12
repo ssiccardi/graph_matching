@@ -32,12 +32,15 @@ def getAttr(ideng, g, conn: Connection):
         + " return properties(p)"
     )
 
-    result = conn.query(q)  # type: ignore
+    result = conn.query(q) 
 
-    if len(result) < 1:  # type: ignore
+    if result is None:
+        raise Exception("Errore con query" + q)
+
+    if len(result) < 1:  
         return d
 
-    result = result.pop()  # type: ignore
+    result = result.pop()  
     result = result.get("properties(p)")
     for e in result:  # itera sulle KEYS e poi estrapola dal nodo tramite key
         if e != "graph" and e != "id":
@@ -64,17 +67,26 @@ def getIdenName(ideng, g, conn : Connection):
         + str(ideng)
         + " return labels(p)"
     )
-    result = conn.query(q)  # type: ignore
-    if len(result) == 0: # type: ignore
+    result = conn.query(q)  
+
+    if result is None:
+        raise Exception("Errore con query" + q)
+
+    if len(result) == 0:
         return l
-    res = result.pop()[0][0]  # type: ignore
+        
+    res = result.pop()[0][0]  
     q = (
         "match (:"
         + res
         + ") -[:IDENTIFIED]-> (:Identifier) -[:IDENTIFIED_BY]-> (p) return p.label as iden"
     )
-    result = conn.query(q)  # type: ignore
-    for res in result:  # type: ignore
+    result = conn.query(q)  
+
+    if result is None:
+        raise Exception("Errore con query" + q)
+
+    for res in result:  
         l.append(res[0])
     l.sort()
     return l
@@ -82,7 +94,12 @@ def getIdenName(ideng, g, conn : Connection):
 
 def canProceed(ideng, conn: Connection):
     # PARTI DA PRESUPPOSTO entita' abbiano un codice identificativo e che quindi in input ci sia solo un ideng
-    return conn.query("MATCH (e) WHERE e.id = " + str(ideng) + " RETURN COUNT(e) as ents")[0][0] == 2  # type: ignore
+    res = conn.query("MATCH (e) WHERE e.id = " + str(ideng) + " RETURN COUNT(e) as ents")
+    
+    if res is None:
+        raise Exception("Errore con" + ideng)
+    
+    return res[0][0] == 2  
 
 
 def retrieveInfos(toExaminG1, toExaminG2, attrG1, attrG2):
@@ -151,10 +168,13 @@ def getSemi(id, grafo, direzione, conn: Connection):
         + str(id)
         + " RETURN id(r) as id, type(r) as tipo, id(startNode(r)) as da, id(endNode(r)) as a"
     )
-    result = conn.query(q)  # type: ignore
+    result = conn.query(q)  
 
-    while len(result) != 0:  # type: ignore
-        res = result.pop()  # type: ignore
+    if result is None:
+        raise Exception("Errore con query" + q)
+
+    while len(result) != 0: 
+        res = result.pop()  
         l.append(
             {
                 "id": res.get("id"),
@@ -185,10 +205,13 @@ def getRel(id, grafo, direzione: int, conn: Connection):
         + str(id)
         + " RETURN id(r) as id, type(r) as tipo, id(startNode(r)) as da, id(endNode(r)) as a"
     )
-    result = conn.query(q)  # type: ignore
+    result = conn.query(q) 
+    
+    if result is None:
+        raise Exception("Errore con query" + q)
 
-    while len(result) != 0:  # type: ignore
-        res = result.pop()  # type: ignore
+    while len(result) != 0:  
+        res = result.pop()  
         l.append(
             {
                 "id": res.get("id"),
@@ -225,7 +248,13 @@ def sameRel(r1, r2, id, direzione: int, conn: Connection):
         + str(id)
         + " return type(r) = type(ee)"
     )
-    return conn.query(q).pop()[0]  # type: ignore
+
+    res = conn.query(q)
+
+    if res is None:
+        raise Exception("Errore con query" + q)
+
+    return res.pop()[0]  
 
 
 # @param(r1, r2) id delle relazioni
@@ -238,7 +267,13 @@ def sameTarget(r1, r2, conn: Connection):
         + str(r2)
         + " return e.id = id1"
     )
-    return conn.query(q).pop()[0]  # type: ignore
+    
+    res = conn.query(q)
+
+    if res is None:
+        raise Exception("Errore con query" + q)
+
+    return res.pop()[0]  
 
 
 # @param(r1, r2) id delle relazioni
@@ -251,14 +286,21 @@ def sameSource(r1, r2, conn: Connection):
         + str(r2)
         + " return e.id = id1"
     )
-    return conn.query(q).pop()[0]  # type: ignore
+    
+    res = conn.query(q)
+
+    if res is None:
+        raise Exception("Errore con query" + q)
+
+    return res.pop()[0]  
 
 
 # crea stringhe dove segnali coincidenze o complementarità' se non sopra limite, contraddittorietà' altrimenti
 def overLimit(tipo, val, l1, l2, conn: Connection):
+    #TODO l1 e l2 servono?
     l = list()
     if val > getLimit(tipo, conn):
-        l.append( # type: ignore
+        l.append( 
             "Relazione di tipo "
             + tipo
             + " contraddittoria, nei due grafi esplorati esistono ben "
