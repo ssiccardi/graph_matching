@@ -1,4 +1,3 @@
-
 from Functions.AlgorithmUtilities import createTypeBucket, getRel, getSemi, overLimit, sameRel, sameSource, sameTarget
 from Functions.Relation import areDirectlyContraddictory, isFissa
 from Functions.Connection import Connection
@@ -28,7 +27,7 @@ def getInfoSemi(id: int, conn: Connection):
                 toRem.append(r2.get("id"))
                 # b = False
                 # break #ora tolti
-            if sameRel(r1.get("id"), r2.get("id"), id, 1, conn) and sameSource(r1.get("id"), r2.get("id"), conn):  # capisci se si può fare lo stesso usando le info disponibili in relE1 e relE2 (tipo e1.get('da') == ...)
+            elif sameRel(r1.get("id"), r2.get("id"), id, 1, conn) and sameSource(r1.get("id"), r2.get("id"), conn):  # capisci se si può fare lo stesso usando le info disponibili in relE1 e relE2 (tipo e1.get('da') == ...)
                 print("Relazione coincidente in G1 di tipo {} con entità di partenza id:{} e entità di arrivo id:{}".format(r1.get("tipo"), r1.get("da"), r1.get("a")))
                 typeBucket[r1.get("tipo")] += 1
                 b = False
@@ -132,7 +131,7 @@ def relationMatching(id: int, conn: Connection):
                 toRem.append(rel2.get("id"))
                 # compl = None
                 # break #Per ora tolti
-            if sameRel(rel1.get("id"), rel2.get("id"), id, 1, conn):
+            elif sameRel(rel1.get("id"), rel2.get("id"), id, 1, conn):
                 if sameSource(rel1.get("id"), rel2.get("id"), conn):
                     print("Coincidente -->", rel1)  # COINCIDENTE
                     toRem.append(rel2.get("id"))
