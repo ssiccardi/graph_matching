@@ -1,6 +1,7 @@
 
 import pandas as pd
 
+import pandas as pd
 from Functions.AlgorithmUtilities import createTypeBucket, getRel, getSemi, overLimit, sameRel, sameSource, sameTarget
 from Functions.Relation import areDirectlyContraddictory, isFissa
 from Functions.Connection import Connection
