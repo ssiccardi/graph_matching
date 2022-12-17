@@ -432,15 +432,15 @@ def checkInsertion(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool
     return True
 
 
-def areDirectlyContraddictory(relType1, relType2, idR1, idR2, conn: Connection) -> bool:
+def areDirectlyContraddictory(relType1: str, relType2:str, idR1, idR2, conn: Connection) -> bool:
     if relType1 == relType2:
         return False;
         
-    if sameSource(idR1, idR2, conn):
-        g1 = getContraddictory(relType1, 1, conn)
-        for el in g1:
-            if el == relType2:
-                return True
+    g1 = getContraddictory(relType1, 1, conn)
+    for el in g1:
+        if el == relType2:
+            print("{} in contraddizione con {}".format(el, relType2))
+            return True
     return False
 
 def create_relation_dir(typeES: str, ES_attr: dict, gS, typeET: str, ET_attr: dict, gT, relName: str, conn: Connection) -> str:
