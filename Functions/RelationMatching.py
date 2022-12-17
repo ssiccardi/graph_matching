@@ -137,7 +137,7 @@ def relationMatching(id: int, conn: Connection):
                 toRem.append(rel2.get("id"))
                 # compl = None
                 # break #Per ora tolti
-            elif sameRel(rel1.get("id"), rel2.get("id"), id, 1, conn):
+            if sameRel(rel1.get("id"), rel2.get("id"), id, 1, conn):
                 if sameSource(rel1.get("id"), rel2.get("id"), conn):
                     print("Coincidente -->", rel1)  # COINCIDENTE
                     toRem.append(rel2.get("id"))
