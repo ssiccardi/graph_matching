@@ -327,10 +327,12 @@ def createTypeBucket(relL1, relL2):
 def createDF(src: dict, dst: dict, rel1: int, rel2: int, tipo1: str, tipo2: str, ril: str)-> pd.DataFrame:
     l = []
     s = ""
-    for key in src.keys(): s += str(key) + " : " + str(src.get(key)) + " -- "
+    if src is not None:
+        for key in src.keys(): s += str(key) + " : " + str(src.get(key)) + " -- "
     l.append(s) 
     s = ""
-    for key in dst.keys(): s += str(key) + " : " + str(dst.get(key)) + " -- "
+    if dst is not None:
+        for key in dst.keys(): s += str(key) + " : " + str(dst.get(key)) + " -- "
     l.append(s) 
     return pd.DataFrame({
         "Tipo" : [ril],
@@ -338,6 +340,6 @@ def createDF(src: dict, dst: dict, rel1: int, rel2: int, tipo1: str, tipo2: str,
         "TipoRelG1" : [tipo1],
         "IDRelazioneG2" : [rel2],
         "TipoRelG2" : [tipo2],
-        "Attr. Src" : [l[0]],
-        "Attr. Dst" : [l[1]]
+        "Attr. G1" : [l[0]],
+        "Attr. G2" : [l[1]]
         })
