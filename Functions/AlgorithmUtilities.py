@@ -1,5 +1,6 @@
 from Functions.Relation import getLimit, isSemiFissa
 from Functions.Connection import Connection
+import pandas as pd 
 
 def isNode(el):
     return str(type(el)) == "<class 'neo4j.graph.Node'>"
@@ -205,6 +206,7 @@ def getRel(id, grafo, direzione: int, conn: Connection):
         + str(id)
         + " RETURN id(r) as id, type(r) as tipo, id(startNode(r)) as da, id(endNode(r)) as a"
     )
+    
     result = conn.query(q) 
     
     if result is None:
@@ -321,3 +323,21 @@ def createTypeBucket(relL1, relL2):
     for r in relL2:
         d[r.get("tipo")] = 0
     return d
+
+def createSerie(src: dict, dst: dict, rel1: int, rel2: int, tipo1: str, tipo2: str, ril: str)-> pd.DataFrame:
+    l = []
+    s = ""
+    for key in src.keys(): s += str(key) + " : " + str(src.get(key)) + " -- "
+    l.append(s) 
+    s = ""
+    for key in dst.keys(): s += str(key) + " : " + str(dst.get(key)) + " -- "
+    l.append(s) 
+    return pd.DataFrame({
+        "Rilevazione" : [ril],
+        "ID Relazione Primo Grafo" : [rel1],
+        "Tipo Relazione Primo Grafo" : [rel2],
+        "ID Relazione Secondo Grafo" : [tipo1],
+        "Tipo Relazione Secondo Grafo" : [tipo2],
+        "Attributi Entita' Sorgente" : [l[0]],
+        "Attributi Entita' Destinazione" : [l[1]]
+        })

@@ -1,4 +1,5 @@
 import neo4j
+import pandas as pd
 from Functions.DbUtilities import check_instance, legal_attributes, stringify_attributes
 from Functions.Connection import Connection
 
@@ -45,7 +46,7 @@ def create_instance_mine(conn: Connection, t, attributes, graph, id):
                         + str(t)
                         + " {"
                         + stringify_attributes(attributes)
-                        + "}) RETURN instance.id AS node_id"
+                        + "}) RETURN instance.id AS node_id" # type: ignore
                     )
                     create_id = str(instance_query.single()["node_id"]) # type: ignore
                     return create_id
@@ -75,7 +76,7 @@ def delete_instance(conn: Connection, t: str, attributes: dict):
                     + str(t)
                     + " {"
                     + stringify_attributes(legal_attr)
-                    + "}) DETACH DELETE instance"
+                    + "}) DETACH DELETE instance" # type: ignore
                 )
                 print("Instance deleted")
             tx.commit()
@@ -96,8 +97,21 @@ def delete_instance_id(conn: Connection, id: int):
             tx.run(
                 "MATCH (instance) WHERE id(instance) = "
                 + str(id)
-                + " DELETE instance"
+                + " DELETE instance" # type: ignore
             )
             print("Instance deleted")
             tx.commit()
             tx.close()
+            
+def getEntity(id: int, conn : Connection) -> dict:
+    d = dict()
+    res = conn.query("MATCH (e) WHERE id(e) = " + str(id) + " RETURN properties(e), labels(e)")
+    
+    if res == None:
+        raise ValueError("Could not find id {}".format(id))
+    
+    d['Tipo'] = res[0][1][0]
+    for key in res[0][0].keys():
+        d[key] = res[0][0].get(key)
+        
+    return d

@@ -55,7 +55,7 @@ def check_instance(conn: Connection, t: str, attributes):
                     + t
                     + " {"
                     + stringify_attributes(legal_attributes)
-                    + "}) RETURN instance"
+                    + "}) RETURN instance" # type: ignore
                 )
 
                 tx.commit()
@@ -106,7 +106,7 @@ def get_identifiable_attributes(conn: Connection, t: str):
     with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
         with session.begin_transaction() as tx:
             iden_nodes_query = tx.run(
-                "MATCH (i:Identifier) - [] - (:" + t + ") RETURN id(i)"
+                "MATCH (i:Identifier) - [] - (:" + t + ") RETURN id(i)" # type: ignore
             )
 
             for el in iden_nodes_query.values():

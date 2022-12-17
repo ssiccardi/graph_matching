@@ -205,7 +205,7 @@ def addRelAttribute(conn: Connection, t: str, attribute: str):
                 typePresence = tx.run(
                     "MATCH (instance:Relazione {type: 'relation', label:'"
                     + str(t)
-                    + "'}) RETURN instance"
+                    + "'}) RETURN instance" # type: ignore
                 )
                 typeValues = typePresence.values()
 
@@ -215,7 +215,7 @@ def addRelAttribute(conn: Connection, t: str, attribute: str):
                         + t
                         + "'}) -[rel:HAS]-> (attr:"
                         + attribute
-                        + " {type: 'attr'}) RETURN instance, rel, attr"
+                        + " {type: 'attr'}) RETURN instance, rel, attr" # type: ignore
                     )
                     attrPresentValues = attrAlreadyPresent.values()
 
@@ -227,7 +227,7 @@ def addRelAttribute(conn: Connection, t: str, attribute: str):
                             + attribute
                             + " {label: '"
                             + attribute
-                            + "', type: 'attr'}) RETURN type, rel, attr"
+                            + "', type: 'attr'}) RETURN type, rel, attr" # type: ignore
                         )
                         attrCreate.values()
 
@@ -482,7 +482,7 @@ def create_relation_dir(typeES: str, ES_attr: dict, gS, typeET: str, ET_attr: di
                     + relName
                     + "]-> (eT)"
                 )
-                tx.run(q)
+                tx.run(q) # type: ignore
                 return "OK"
             else:
                 return "RELAZIONE già presente/supera il limite"
@@ -532,7 +532,7 @@ def create_relation_with_attribute(typeES: str, ES_attr: dict, gS, typeET: str, 
                     q += el[0] + ': "' + el[1] + '", '
                 q = q[:-2]
                 q += " }]-> (eT)"
-                tx.run(q)
+                tx.run(q) # type: ignore
                 return "OK"
             else:
                 return "RELAZIONE già presente/supera il limite"
