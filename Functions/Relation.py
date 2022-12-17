@@ -433,6 +433,9 @@ def checkInsertion(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool
 
 
 def areDirectlyContraddictory(relType1, relType2, idR1, idR2, conn: Connection) -> bool:
+    if relType1 == relType2:
+        return False;
+        
     if sameSource(idR1, idR2, conn):
         g1 = getContraddictory(relType1, 1, conn)
         for el in g1:
