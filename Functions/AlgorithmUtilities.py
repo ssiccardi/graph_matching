@@ -324,7 +324,7 @@ def createTypeBucket(relL1, relL2):
         d[r.get("tipo")] = 0
     return d
 
-def createSerie(src: dict, dst: dict, rel1: int, rel2: int, tipo1: str, tipo2: str, ril: str)-> pd.DataFrame:
+def createDF(src: dict, dst: dict, rel1: int, rel2: int, tipo1: str, tipo2: str, ril: str)-> pd.DataFrame:
     l = []
     s = ""
     for key in src.keys(): s += str(key) + " : " + str(src.get(key)) + " -- "
@@ -335,8 +335,8 @@ def createSerie(src: dict, dst: dict, rel1: int, rel2: int, tipo1: str, tipo2: s
     return pd.DataFrame({
         "Rilevazione" : [ril],
         "ID Relazione Primo Grafo" : [rel1],
-        "Tipo Relazione Primo Grafo" : [rel2],
-        "ID Relazione Secondo Grafo" : [tipo1],
+        "Tipo Relazione Primo Grafo" : [tipo1],
+        "ID Relazione Secondo Grafo" : [rel2],
         "Tipo Relazione Secondo Grafo" : [tipo2],
         "Attributi Entita' Sorgente" : [l[0]],
         "Attributi Entita' Destinazione" : [l[1]]
