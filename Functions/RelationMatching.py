@@ -74,21 +74,22 @@ def getInfoSemi(id: int, conn: Connection, df: pd.DataFrame) -> pd.DataFrame:
             b = True
             
     for el in relE2:
-        if not len(toRem):
-            typeBucket[el.get("tipo")] += 1
-            #print("Relazione complementare in G2 di tipo {} con entità di partenza id:{} e entità di arrivo id:{} -- getInfoSemi->penultimoForEntranti".format(el.get("tipo"), el.get("da"), el.get("a")))
-            src, dst = getEntity(el.get('da'), conn), getEntity(el.get('a'), conn)
-            df = pd.concat([df, createDF(src, dst, el.get('id'), -1, el.get('tipo'), "", "Complementare Grafo2")], axis=0)
-        else:
-            b = False
-            for id in toRem:
-                if id == el.get("id"):
-                    b = True
-            if not b:
+        if not isOver(el.get('id'), conn):
+            if not len(toRem):
                 typeBucket[el.get("tipo")] += 1
                 #print("Relazione complementare in G2 di tipo {} con entità di partenza id:{} e entità di arrivo id:{} -- getInfoSemi->penultimoForEntranti".format(el.get("tipo"), el.get("da"), el.get("a")))
                 src, dst = getEntity(el.get('da'), conn), getEntity(el.get('a'), conn)
                 df = pd.concat([df, createDF(src, dst, el.get('id'), -1, el.get('tipo'), "", "Complementare Grafo2")], axis=0)
+            else:
+                b = False
+                for id in toRem:
+                    if id == el.get("id"):
+                        b = True
+                if not b:
+                    typeBucket[el.get("tipo")] += 1
+                    #print("Relazione complementare in G2 di tipo {} con entità di partenza id:{} e entità di arrivo id:{} -- getInfoSemi->penultimoForEntranti".format(el.get("tipo"), el.get("da"), el.get("a")))
+                    src, dst = getEntity(el.get('da'), conn), getEntity(el.get('a'), conn)
+                    df = pd.concat([df, createDF(src, dst, el.get('id'), -1, el.get('tipo'), "", "Complementare Grafo2")], axis=0)
 
     for t in typeBucket.keys():
         print("Relazione semifissa {} -- {} -- getInfoSemi-> ultimoForEntranti".format(t, overLimit(t, typeBucket.get(t), relE1, relE2, conn)))
@@ -120,19 +121,20 @@ def getInfoSemi(id: int, conn: Connection, df: pd.DataFrame) -> pd.DataFrame:
             b = True
 
     for el in relP2:
-        if not len(toRem):
-            #print("Relazione complementare in G2 di tipo {} con entità di partenza id:{} e entità di arrivo id:{} -- getInfoSemiPartenti ultimo for".format(el.get("tipo"), el.get("da"), el.get("a")))
-            src, dst = getEntity(el.get('da'), conn), getEntity(el.get('a'), conn)
-            df = pd.concat([df, createDF(src, dst, el.get('id'), -1, el.get('tipo'), "", "Complementare Grafo2")], axis=0)
-        else:
-            b = False
-            for id in toRem:
-                if id == el.get("id"):
-                    b = True
-            if not b:
+        if not isOver(el.get('id'), conn):
+            if not len(toRem):
                 #print("Relazione complementare in G2 di tipo {} con entità di partenza id:{} e entità di arrivo id:{} -- getInfoSemiPartenti ultimo for".format(el.get("tipo"), el.get("da"), el.get("a")))
                 src, dst = getEntity(el.get('da'), conn), getEntity(el.get('a'), conn)
                 df = pd.concat([df, createDF(src, dst, el.get('id'), -1, el.get('tipo'), "", "Complementare Grafo2")], axis=0)
+            else:
+                b = False
+                for id in toRem:
+                    if id == el.get("id"):
+                        b = True
+                if not b:
+                    #print("Relazione complementare in G2 di tipo {} con entità di partenza id:{} e entità di arrivo id:{} -- getInfoSemiPartenti ultimo for".format(el.get("tipo"), el.get("da"), el.get("a")))
+                    src, dst = getEntity(el.get('da'), conn), getEntity(el.get('a'), conn)
+                    df = pd.concat([df, createDF(src, dst, el.get('id'), -1, el.get('tipo'), "", "Complementare Grafo2")], axis=0)
     return df
 
 
@@ -146,8 +148,7 @@ def relationMatching(id: int, conn: Connection):
         id (int): [id appartenente all'entita' da analizzare]\n
         conn (Connection): [oggetto dedicato alla connessione a Neo4j]
     """
-    df = pd.DataFrame(columns=["Rilevazione","ID Relazione Primo Grafo","Tipo Relazione Primo Grafo", "ID Relazione Secondo Grafo","Tipo Relazione Secondo Grafo",
-               "Attributi Entita' Sorgente","Attributi Entita' Destinazione"])
+    df = pd.DataFrame(columns=["Tipo", "IDRelazioneG1", "TipoRelG1", "IDRelazioneG2", "TipoRelG2","Attr. Src","Attr. Dst"])
     
     relP1, relP2 = getRel(id, 1, 0, conn), getRel(id, 2, 0, conn)
     relE1, relE2 = getRel(id, 1, 1, conn), getRel(id, 2, 1, conn)
@@ -179,19 +180,20 @@ def relationMatching(id: int, conn: Connection):
                 compl = False #TODO NOT SURE
 
     for rel in relP2:
-        if not len(toRem):
-            src, dst = getEntity(rel.get('da'), conn), getEntity(rel.get('a'), conn)
-            df = pd.concat([df, createDF(src, dst, rel.get('id'), -1, rel.get('tipo'), "", "Complementare Grafo2")], axis=0)
-            #print("Complementare -->", rel)  # COMPLEMENTARE
-        else:
-            compl = False
-            for rem in toRem:
-                if rel.get("id") == rem:
-                    compl = True
-            if not compl:
+        if not isOver(rel.get('id'), conn):
+            if not len(toRem):
                 src, dst = getEntity(rel.get('da'), conn), getEntity(rel.get('a'), conn)
                 df = pd.concat([df, createDF(src, dst, rel.get('id'), -1, rel.get('tipo'), "", "Complementare Grafo2")], axis=0)
                 #print("Complementare -->", rel)  # COMPLEMENTARE
+            else:
+                compl = False
+                for rem in toRem:
+                    if rel.get("id") == rem:
+                        compl = True
+                if not compl:
+                    src, dst = getEntity(rel.get('da'), conn), getEntity(rel.get('a'), conn)
+                    df = pd.concat([df, createDF(src, dst, rel.get('id'), -1, rel.get('tipo'), "", "Complementare Grafo2")], axis=0)
+                    #print("Complementare -->", rel)  # COMPLEMENTARE
     
     # ENTRANTI:
     compl = False
@@ -242,19 +244,20 @@ def relationMatching(id: int, conn: Connection):
                 df = pd.concat([df, createDF(src, dst, rel1.get('id'), -1, rel1.get('tipo'), "", "Complementare Grafo1")], axis=0)
 
     for rel in relE2:
-        if not len(toRem):
-            #print("Complementare -->", rel)  # COMPLEMENTARE
-            src, dst = getEntity(rel.get('da'), conn), getEntity(rel.get('a'), conn)
-            df = pd.concat([df, createDF(src, dst, rel.get('id'), -1, rel.get('tipo'), "", "Complementare Grafo2")], axis=0)
-        else:
-            compl = False
-            for rem in toRem:
-                if rel.get("id") == rem:
-                    compl = True
-            if not compl:
+        if not isOver(rel.get('id'), conn):
+            if not len(toRem):
                 #print("Complementare -->", rel)  # COMPLEMENTARE
                 src, dst = getEntity(rel.get('da'), conn), getEntity(rel.get('a'), conn)
                 df = pd.concat([df, createDF(src, dst, rel.get('id'), -1, rel.get('tipo'), "", "Complementare Grafo2")], axis=0)
+            else:
+                compl = False
+                for rem in toRem:
+                    if rel.get("id") == rem:
+                        compl = True
+                if not compl:
+                    #print("Complementare -->", rel)  # COMPLEMENTARE
+                    src, dst = getEntity(rel.get('da'), conn), getEntity(rel.get('a'), conn)
+                    df = pd.concat([df, createDF(src, dst, rel.get('id'), -1, rel.get('tipo'), "", "Complementare Grafo2")], axis=0)
 
     df = getInfoSemi(id, conn, df)
     return df

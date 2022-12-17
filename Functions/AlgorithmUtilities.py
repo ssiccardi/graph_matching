@@ -333,11 +333,11 @@ def createDF(src: dict, dst: dict, rel1: int, rel2: int, tipo1: str, tipo2: str,
     for key in dst.keys(): s += str(key) + " : " + str(dst.get(key)) + " -- "
     l.append(s) 
     return pd.DataFrame({
-        "Rilevazione" : [ril],
-        "ID Relazione Primo Grafo" : [rel1],
-        "Tipo Relazione Primo Grafo" : [tipo1],
-        "ID Relazione Secondo Grafo" : [rel2],
-        "Tipo Relazione Secondo Grafo" : [tipo2],
-        "Attributi Entita' Sorgente" : [l[0]],
-        "Attributi Entita' Destinazione" : [l[1]]
+        "Tipo" : [ril],
+        "IDRelazioneG1" : [rel1],
+        "TipoRelG1" : [tipo1],
+        "IDRelazioneG2" : [rel2],
+        "TipoRelG2" : [tipo2],
+        "Attr. Src" : [l[0]],
+        "Attr. Dst" : [l[1]]
         })
