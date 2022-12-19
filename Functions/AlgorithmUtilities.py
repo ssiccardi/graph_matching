@@ -12,6 +12,32 @@ def whichGraph(g):
         return "p.graph = 2 and "
     raise Exception("Errore con variabile", g, " -- Valore non ammesso")
 
+def getAttr2(id, conn: Connection) -> dict:
+    #TODO
+    l = list()
+    d = {}
+    q = (
+        "match (p) where "
+        + "id(p) = "
+        + str(id)
+        + " return properties(p)"
+    )
+
+    result = conn.query(q) 
+
+    if result is None:
+        raise Exception("Errore con query" + q)
+
+    if len(result) < 1:  
+        return d
+
+    result = result.pop()  
+    result = result.get("properties(p)")
+    for e in result:  # itera sulle KEYS e poi estrapola dal nodo tramite key
+        if e != "graph" and e != "id":
+            d[e] = result.get(e)
+    return dict(sorted(d.items()))  # ORA RITORNA UN DIZIONARIO
+    return l
 
 def getAttr(ideng, g, conn: Connection):  
     """Ritorna una lista di chiavi valori con gli attributi
@@ -48,6 +74,38 @@ def getAttr(ideng, g, conn: Connection):
             d[e] = result.get(e)
     return dict(sorted(d.items()))  # ORA RITORNA UN DIZIONARIO
 
+def getIdenName2(id, conn: Connection) -> list:
+    #TODO
+    l = list()
+    q = (
+        "match (p) where "
+        + "id(p) = "
+        + str(id)
+        + " return labels(p)"
+    )
+    result = conn.query(q)  
+
+    if result is None:
+        raise Exception("Errore con query" + q)
+
+    if len(result) == 0:
+        return l
+        
+    res = result.pop()[0][0]  
+    q = (
+        "match (:"
+        + res
+        + ") -[:IDENTIFIED]-> (:Identifier) -[:IDENTIFIED_BY]-> (p) return p.label as iden"
+    )
+    result = conn.query(q)  
+
+    if result is None:
+        raise Exception("Errore con query" + q)
+
+    for res in result:  
+        l.append(res[0])
+    l.sort()
+    return l
 
 def getIdenName(ideng, g, conn : Connection):
     """Ritorna una lista di attributi identitari
@@ -258,10 +316,34 @@ def sameRel(r1, r2, id, direzione: int, conn: Connection):
 
     return res.pop()[0]  
 
+def sameTargetIden(r1, r2, conn: Connection) -> bool:
+    q = ("MATCH () -[r]-> (e) WHERE id(r) = " + str(r1) + " WITH id(e) as id1 MATCH () -[r]-> (e) WHERE id(r) = " + str(r2) + " RETURN id1, id(e) as id2")
+    res = conn.query(q)
+    if res is None:
+        raise Exception("Errore con query" + q)
+    iden1, iden2 = getIdenName2(res[0][0], conn), getIdenName2(res[0][1], conn)
+    if iden1 == iden2:
+        attr1, attr2 = getAttr2(res[0][0], conn), getAttr2(res[0][1], conn)
+        for i in iden1:
+            if attr1.get(i) != attr2.get(i):
+                return False
+        return True
+    return False
 
-# @param(r1, r2) id delle relazioni
-# return --> true se la relazione ha la stessa entita' di arrivo, false altrimenti
-def sameTarget(r1, r2, conn: Connection):
+def sameTarget(r1, r2, conn: Connection) -> bool:
+    """Stabilisce sue due relazioni hanno la stessa entita' target sulla base degli id extra
+
+    Args:
+        r1 (int or str): id relazione
+        r2 (int or str): id relazione_
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Raises:
+        Exception: Se la query non va a buon fine 
+
+    Returns:
+        bool: True se hanno gli stessi ID extra, False altrimenti
+    """    
     q = (
         "match () -[r]-> (e) where id(r) = "
         + str(r1)
@@ -277,10 +359,34 @@ def sameTarget(r1, r2, conn: Connection):
 
     return res.pop()[0]  
 
+def sameSourceIden(r1, r2, conn: Connection) -> bool:
+    q = ("MATCH (e) -[r]-> () WHERE id(r) = " + str(r1) + " WITH id(e) as id1 MATCH (e) -[r]-> () WHERE id(r) = " + str(r2) + " RETURN id1, id(e) as id2")
+    res = conn.query(q)
+    if res is None:
+        raise Exception("Errore con query" + q)
+    iden1, iden2 = getIdenName2(res[0][0], conn), getIdenName2(res[0][1], conn)
+    if iden1 == iden2:
+        attr1, attr2 = getAttr2(res[0][0], conn), getAttr2(res[0][1], conn)
+        for i in iden1:
+            if attr1.get(i) != attr2.get(i):
+                return False
+        return True
+    return False;
 
-# @param(r1, r2) id delle relazioni
-# return --> true se la relazione ha la stessa entita' di partenza, false altrimenti
-def sameSource(r1, r2, conn: Connection):
+def sameSource(r1, r2, conn: Connection)-> bool:
+    """Stabilisce sue due relazioni hanno la stessa entita' sorgente sulla base degli id extra
+
+    Args:
+        r1 (int or str): id relazione
+        r2 (int or str): id relazione_
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Raises:
+        Exception: Se la query non va a buon fine 
+
+    Returns:
+        bool: True se hanno gli stessi ID extra, False altrimenti
+    """    
     q = (
         "match (e) -[r]-> () where id(r) = "
         + str(r1)
