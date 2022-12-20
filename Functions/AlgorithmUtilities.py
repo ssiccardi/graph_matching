@@ -12,7 +12,7 @@ def whichGraph(g):
         return "p.graph = 2 and "
     raise Exception("Errore con variabile", g, " -- Valore non ammesso")
 
-def getAttr2(id, conn: Connection) -> dict:
+def getAttrId(id, conn: Connection) -> dict:
     #TODO
     l = list()
     d = {}
@@ -74,7 +74,7 @@ def getAttr(ideng, g, conn: Connection):
             d[e] = result.get(e)
     return dict(sorted(d.items()))  # ORA RITORNA UN DIZIONARIO
 
-def getIdenName2(id, conn: Connection) -> list:
+def getIdenNameId(id, conn: Connection) -> list:
     #TODO
     l = list()
     q = (
@@ -321,9 +321,9 @@ def sameTargetIden(r1, r2, conn: Connection) -> bool:
     res = conn.query(q)
     if res is None:
         raise Exception("Errore con query" + q)
-    iden1, iden2 = getIdenName2(res[0][0], conn), getIdenName2(res[0][1], conn)
+    iden1, iden2 = getIdenNameId(res[0][0], conn), getIdenNameId(res[0][1], conn)
     if iden1 == iden2:
-        attr1, attr2 = getAttr2(res[0][0], conn), getAttr2(res[0][1], conn)
+        attr1, attr2 = getAttrId(res[0][0], conn), getAttrId(res[0][1], conn)
         for i in iden1:
             if attr1.get(i) != attr2.get(i):
                 return False
@@ -364,9 +364,9 @@ def sameSourceIden(r1, r2, conn: Connection) -> bool:
     res = conn.query(q)
     if res is None:
         raise Exception("Errore con query" + q)
-    iden1, iden2 = getIdenName2(res[0][0], conn), getIdenName2(res[0][1], conn)
+    iden1, iden2 = getIdenNameId(res[0][0], conn), getIdenNameId(res[0][1], conn)
     if iden1 == iden2:
-        attr1, attr2 = getAttr2(res[0][0], conn), getAttr2(res[0][1], conn)
+        attr1, attr2 = getAttrId(res[0][0], conn), getAttrId(res[0][1], conn)
         for i in iden1:
             if attr1.get(i) != attr2.get(i):
                 return False
