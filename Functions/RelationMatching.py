@@ -5,14 +5,14 @@ from Functions.AlgorithmUtilities import (
     getSemi,
     overLimit,
     sameRel,
-    sameSourceIden,
-    sameTargetIden,
     createDF
 )
 from Functions.Relation import (
     areDirectlyContraddictory, 
     isFissa, 
-    isOver
+    isOver,
+    sameSourceIden,
+    sameTargetIden
 )
 from Functions.Connection import Connection
 from Functions.Entity import getEntity

@@ -1,20 +1,51 @@
+from Functions.AlgorithmUtilities import getIdenNameId, getAttrId, getLimit
 from Functions.DbUtilities import getEntityId
 from Functions.Connection import Connection
 from datetime import date
 import neo4j
 
+def sameTargetIden(r1, r2, conn: Connection) -> bool:
+    q = ("MATCH () -[r]-> (e) WHERE id(r) = " + str(r1) + " WITH id(e) as id1 MATCH () -[r]-> (e) WHERE id(r) = " + str(r2) + " RETURN id1, id(e) as id2")
+    res = conn.query(q)
+    if res is None:
+        raise Exception("Errore con query" + q)
+    iden1, iden2 = getIdenNameId(res[0][0], conn), getIdenNameId(res[0][1], conn)
+    if iden1 == iden2:
+        attr1, attr2 = getAttrId(res[0][0], conn), getAttrId(res[0][1], conn)
+        for i in iden1:
+            if attr1.get(i) != attr2.get(i):
+                return False
+        return True
+    return False
 
-def sameSource(r1, r2, conn: Connection) -> bool:
-    """Controlla se le relazioni hanno la stessa entita' di partenza
+def sameSourceIden(r1, r2, conn: Connection) -> bool:
+    q = ("MATCH (e) -[r]-> () WHERE id(r) = " + str(r1) + " WITH id(e) as id1 MATCH (e) -[r]-> () WHERE id(r) = " + str(r2) + " RETURN id1, id(e) as id2")
+    res = conn.query(q)
+    if res is None:
+        raise Exception("Errore con query" + q)
+    iden1, iden2 = getIdenNameId(res[0][0], conn), getIdenNameId(res[0][1], conn)
+    if iden1 == iden2:
+        attr1, attr2 = getAttrId(res[0][0], conn), getAttrId(res[0][1], conn)
+        for i in iden1:
+            if attr1.get(i) != attr2.get(i):
+                return False
+        return True
+    return False;
+
+def sameSource(r1, r2, conn: Connection)-> bool:
+    """Stabilisce sue due relazioni hanno la stessa entita' sorgente sulla base degli id extra
 
     Args:
-        r1 (int or str): id della relazione in grafo1
-        r2 (int or str): id della relazione in grafo2
-        conn (Connnection): oggetto dedicato alla connessione a Neo4j
+        r1 (int or str): id relazione
+        r2 (int or str): id relazione_
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Raises:
+        Exception: Se la query non va a buon fine 
 
     Returns:
-        bool: True se hanno stessa fonte, False altrimenti
-    """
+        bool: True se hanno gli stessi ID extra, False altrimenti
+    """    
     q = (
         "match (e) -[r]-> () where id(r) = "
         + str(r1)
@@ -22,54 +53,42 @@ def sameSource(r1, r2, conn: Connection) -> bool:
         + str(r2)
         + " return e.id = id1"
     )
+    
     res = conn.query(q)
-    if res == None:
-        raise Exception("Errore tra {} e {}".format(r1, r2))
+
+    if res is None:
+        raise Exception("Errore con query" + q)
+
     return res.pop()[0] 
 
-
-def getLimit(t: str, conn: Connection) -> int:
-    """Ottiene la Cardinalita per una relazione semifissa
-
-    Args:
-        t (str): nome della relazione
-        conn (Connectio): oggetto dedicato alla connessione a Neo4j
-
-    Returns:
-        int: Cardinalita relazione se presente, ?unknown? altrimenti
-    """
-    q = (
-        "MATCH (e) -[:HAS]-> (ee) WHERE e.label ='"
-        + t
-        + "' and labels(ee)[0] = 'Cardinalita' return properties(ee).label"
-    )
-    res = conn.query(q)
-    if res == None:
-        raise Exception("Errore per relazione di tipo {}".format(t))
-    return int(res.pop()[0])
-
-
-def isSemiFissa(t: str, conn: Connection) -> bool:
-    """Capisce se la relazione e' di tipo SemiFisso
+def sameTarget(r1, r2, conn: Connection) -> bool:
+    """Stabilisce sue due relazioni hanno la stessa entita' target sulla base degli id extra
 
     Args:
-        t (str): nome della relazione
+        r1 (int or str): id relazione
+        r2 (int or str): id relazione_
         conn (Connection): oggetto dedicato alla connessione a Neo4j
 
+    Raises:
+        Exception: Se la query non va a buon fine 
+
     Returns:
-        bool: True se SemiFissa, False altrimenti
-    """
+        bool: True se hanno gli stessi ID extra, False altrimenti
+    """    
     q = (
-        "match (e) -[:HAS]-> (something) where e.label = '"
-        + t
-        + "' and labels(something)[0] = 'Cardinalita' return something.label <> '1' and something.label <> 'n'"
+        "match () -[r]-> (e) where id(r) = "
+        + str(r1)
+        + " with e.id as id1 match () -[r]-> (e) where id(r) = "
+        + str(r2)
+        + " return e.id = id1"
     )
     
     res = conn.query(q)
-    if res == None:
-        raise Exception("Errore per relazione di tipo {}".format(t))
-    return res.pop()[0]  
 
+    if res is None:
+        raise Exception("Errore con query" + q)
+
+    return res.pop()[0]  
 
 def isFissa(t: str, conn: Connection) -> bool:
     """Capisce se la relazione e' di tipo Fisso
@@ -431,12 +450,12 @@ def checkInsertion(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool
 
     return True
 
-
+#SOLO PER ENTRANTI
 def areDirectlyContraddictory(relType1: str, relType2:str, idR1, idR2, conn: Connection) -> bool:
-    if relType1 == relType2 or sameSource(idR1, idR2, conn):
+    if relType1 == relType2 or not sameSourceIden(idR1, idR2, conn):
         return False
     
-    return  getContraddictory(relType1, 1, conn).__contains__(relType2)
+    return getContraddictory(relType1, 1, conn).__contains__(relType2)
 
 def create_relation_dir(typeES: str, ES_attr: dict, gS, typeET: str, ET_attr: dict, gT, relName: str, conn: Connection) -> str:
     """Crea, se possibile, una relazione tra l'entita' sorgente e quella destinazione, riconosciute tramite i parametri passati, con nome specificato

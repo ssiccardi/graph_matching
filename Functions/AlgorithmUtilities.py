@@ -1,4 +1,3 @@
-from Functions.Relation import getLimit, isSemiFissa
 from Functions.Connection import Connection
 import pandas as pd 
 
@@ -12,9 +11,50 @@ def whichGraph(g):
         return "p.graph = 2 and "
     raise Exception("Errore con variabile", g, " -- Valore non ammesso")
 
+def getLimit(t: str, conn: Connection) -> int:
+    """Ottiene la Cardinalita per una relazione semifissa
+
+    Args:
+        t (str): nome della relazione
+        conn (Connectio): oggetto dedicato alla connessione a Neo4j
+
+    Returns:
+        int: Cardinalita relazione se presente, ?unknown? altrimenti
+    """
+    q = (
+        "MATCH (e) -[:HAS]-> (ee) WHERE e.label ='"
+        + t
+        + "' and labels(ee)[0] = 'Cardinalita' return properties(ee).label"
+    )
+    res = conn.query(q)
+    if res == None:
+        raise Exception("Errore per relazione di tipo {}".format(t))
+    return int(res.pop()[0])
+
+def isSemiFissa(t: str, conn: Connection) -> bool:
+    """Capisce se la relazione e' di tipo SemiFisso
+
+    Args:
+        t (str): nome della relazione
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Returns:
+        bool: True se SemiFissa, False altrimenti
+    """
+    q = (
+        "match (e) -[:HAS]-> (something) where e.label = '"
+        + t
+        + "' and labels(something)[0] = 'Cardinalita' return something.label <> '1' and something.label <> 'n'"
+    )
+    
+    res = conn.query(q)
+    if res == None:
+        raise Exception("Errore per relazione di tipo {}".format(t))
+    return res.pop()[0]  
+
+
 def getAttrId(id, conn: Connection) -> dict:
     #TODO
-    l = list()
     d = {}
     q = (
         "match (p) where "
@@ -33,11 +73,12 @@ def getAttrId(id, conn: Connection) -> dict:
 
     result = result.pop()  
     result = result.get("properties(p)")
+
     for e in result:  # itera sulle KEYS e poi estrapola dal nodo tramite key
         if e != "graph" and e != "id":
             d[e] = result.get(e)
+    
     return dict(sorted(d.items()))  # ORA RITORNA UN DIZIONARIO
-    return l
 
 def getAttr(ideng, g, conn: Connection):  
     """Ritorna una lista di chiavi valori con gli attributi
@@ -315,93 +356,6 @@ def sameRel(r1, r2, id, direzione: int, conn: Connection):
         raise Exception("Errore con query" + q)
 
     return res.pop()[0]  
-
-def sameTargetIden(r1, r2, conn: Connection) -> bool:
-    q = ("MATCH () -[r]-> (e) WHERE id(r) = " + str(r1) + " WITH id(e) as id1 MATCH () -[r]-> (e) WHERE id(r) = " + str(r2) + " RETURN id1, id(e) as id2")
-    res = conn.query(q)
-    if res is None:
-        raise Exception("Errore con query" + q)
-    iden1, iden2 = getIdenNameId(res[0][0], conn), getIdenNameId(res[0][1], conn)
-    if iden1 == iden2:
-        attr1, attr2 = getAttrId(res[0][0], conn), getAttrId(res[0][1], conn)
-        for i in iden1:
-            if attr1.get(i) != attr2.get(i):
-                return False
-        return True
-    return False
-
-def sameTarget(r1, r2, conn: Connection) -> bool:
-    """Stabilisce sue due relazioni hanno la stessa entita' target sulla base degli id extra
-
-    Args:
-        r1 (int or str): id relazione
-        r2 (int or str): id relazione_
-        conn (Connection): oggetto dedicato alla connessione a Neo4j
-
-    Raises:
-        Exception: Se la query non va a buon fine 
-
-    Returns:
-        bool: True se hanno gli stessi ID extra, False altrimenti
-    """    
-    q = (
-        "match () -[r]-> (e) where id(r) = "
-        + str(r1)
-        + " with e.id as id1 match () -[r]-> (e) where id(r) = "
-        + str(r2)
-        + " return e.id = id1"
-    )
-    
-    res = conn.query(q)
-
-    if res is None:
-        raise Exception("Errore con query" + q)
-
-    return res.pop()[0]  
-
-def sameSourceIden(r1, r2, conn: Connection) -> bool:
-    q = ("MATCH (e) -[r]-> () WHERE id(r) = " + str(r1) + " WITH id(e) as id1 MATCH (e) -[r]-> () WHERE id(r) = " + str(r2) + " RETURN id1, id(e) as id2")
-    res = conn.query(q)
-    if res is None:
-        raise Exception("Errore con query" + q)
-    iden1, iden2 = getIdenNameId(res[0][0], conn), getIdenNameId(res[0][1], conn)
-    if iden1 == iden2:
-        attr1, attr2 = getAttrId(res[0][0], conn), getAttrId(res[0][1], conn)
-        for i in iden1:
-            if attr1.get(i) != attr2.get(i):
-                return False
-        return True
-    return False;
-
-def sameSource(r1, r2, conn: Connection)-> bool:
-    """Stabilisce sue due relazioni hanno la stessa entita' sorgente sulla base degli id extra
-
-    Args:
-        r1 (int or str): id relazione
-        r2 (int or str): id relazione_
-        conn (Connection): oggetto dedicato alla connessione a Neo4j
-
-    Raises:
-        Exception: Se la query non va a buon fine 
-
-    Returns:
-        bool: True se hanno gli stessi ID extra, False altrimenti
-    """    
-    q = (
-        "match (e) -[r]-> () where id(r) = "
-        + str(r1)
-        + " with e.id as id1 match (e) -[r]-> () where id(r) = "
-        + str(r2)
-        + " return e.id = id1"
-    )
-    
-    res = conn.query(q)
-
-    if res is None:
-        raise Exception("Errore con query" + q)
-
-    return res.pop()[0]  
-
 
 # crea stringhe dove segnali coincidenze o complementarità' se non sopra limite, contraddittorietà' altrimenti
 def overLimit(tipo, val, l1, l2, conn: Connection):
