@@ -66,8 +66,8 @@ def getInfoSemi(id: int, conn: Connection, df: pd.DataFrame) -> pd.DataFrame:
         if not isOver(el.get('id'), conn):
             if not len(toRem):
                 typeBucket[el.get("tipo")] += 1
-                src, dst = getEntity(el.get('a'), conn), getEntity(el.get('a'), conn)
-                df = pd.concat([df, createDF(src, dst, el.get('id'), -1, el.get('tipo'), "", "Complementare Grafo2")], axis=0)
+                src = getEntity(el.get('da'), conn)
+                df = pd.concat([df, createDF(src, None, el.get('id'), -1, el.get('tipo'), "", "Complementare Grafo2")], axis=0) # type: ignore
             else:
                 b = False
                 for id in toRem:
@@ -75,8 +75,8 @@ def getInfoSemi(id: int, conn: Connection, df: pd.DataFrame) -> pd.DataFrame:
                         b = True
                 if not b:
                     typeBucket[el.get("tipo")] += 1
-                    src, dst = getEntity(el.get('a'), conn), getEntity(el.get('a'), conn)
-                    df = pd.concat([df, createDF(src, dst, el.get('id'), -1, el.get('tipo'), "", "Complementare Grafo2")], axis=0)
+                src = getEntity(el.get('da'), conn)
+                df = pd.concat([df, createDF(src, None, el.get('id'), -1, el.get('tipo'), "", "Complementare Grafo2")], axis=0) # type: ignore
 
     for t in typeBucket.keys():
         df = pd.concat([df, createDF(None, None, -1, -1, "", "", "SemiFissa" + str(overLimit(t, typeBucket.get(t), relE1, relE2, conn)))], axis=0) # type: ignore 
@@ -154,15 +154,15 @@ def relationMatching(id: int, conn: Connection):
                 else:
                     toRem.append(rel2.get("id"))
             if compl:# COMPLEMENTARE
-                src, dst = getEntity(rel1.get('da'), conn), getEntity(rel1.get('a'), conn)
-                df = pd.concat([df, createDF(src, dst, rel1.get('id'), -1, rel1.get('tipo'), "", "Complementare Grafo1")], axis=0)
-                compl = False #TODO NOT SURE
+                src = getEntity(rel1.get('a'), conn)
+                df = pd.concat([df, createDF(src, None, rel1.get('id'), -1, rel1.get('tipo'), "", "Complementare Grafo1")], axis=0) # type: ignore
+                compl = False 
 
     for rel in relP2:
         if not isOver(rel.get('id'), conn):
             if not len(toRem):
-                src, dst = getEntity(rel.get('a'), conn), getEntity(rel.get('a'), conn)
-                df = pd.concat([df, createDF(src, dst, rel.get('id'), -1, rel.get('tipo'), "", "Complementare Grafo2")], axis=0)# COMPLEMENTARE
+                src = getEntity(rel.get('a'), conn)
+                df = pd.concat([df, createDF(src, None, rel.get('id'), -1, rel.get('tipo'), "", "Complementare Grafo2")], axis=0) # type: ignore # COMPLEMENTARE
             else:
                 compl = False
                 for rem in toRem:

@@ -394,6 +394,7 @@ def createDF(src: dict, dst: dict, rel1: int, rel2: int, tipo1: str, tipo2: str,
     if dst is not None:
         for key in dst.keys(): s += str(key) + " : " + str(dst.get(key)) + " -- "
     l.append(s) 
+
     return pd.DataFrame({
         "Tipo" : [ril],
         "IDRelazioneG1" : [rel1],
