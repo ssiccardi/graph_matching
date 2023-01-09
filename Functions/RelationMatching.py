@@ -17,6 +17,8 @@ from Functions.Relation import (
 from Functions.Connection import Connection
 from Functions.Entity import getEntity
 
+#TODO code optimization
+
 
 def getInfoSemi(id: int, conn: Connection, df: pd.DataFrame) -> pd.DataFrame:
     """Analizza le relazioni SemiFisse legate all'id passato in input, mostrando all'utente cosa nota
@@ -42,8 +44,6 @@ def getInfoSemi(id: int, conn: Connection, df: pd.DataFrame) -> pd.DataFrame:
                         df = pd.concat([df, createDF(src, dst, r1.get('id'), r2.get('id'), r1.get('tipo'), r2.get('tipo'), "Contraddittoria diretta Grafo 1 - SemiFissa")], axis=0)
                         
                         toRem.append(r2.get("id"))
-                        # b = False
-                        # break #ora tolti
                     if sameRel(r1.get("id"), r2.get("id"), id, 1, conn) and sameSourceIden(r1.get("id"), r2.get("id"), conn):  
                         
                         src, dst = getEntity(r1.get('da'), conn), getEntity(r2.get('da'), conn)
@@ -186,8 +186,6 @@ def relationMatching(id: int, conn: Connection):
                         df = pd.concat([df, createDF(src, dst, rel1.get('id'), rel2.get('id'), rel1.get('tipo'), rel2.get('tipo'), "Contraddittoria diretta")], axis=0)
                         
                         toRem.append(rel2.get("id"))
-                        # compl = None
-                        # break #Per ora tolti
                     if sameRel(rel1.get("id"), rel2.get("id"), id, 1, conn):
                         if sameSourceIden(rel1.get("id"), rel2.get("id"), conn): # COINCIDENTE
                             src, dst = getEntity(rel1.get('da'), conn), getEntity(rel2.get('da'), conn)

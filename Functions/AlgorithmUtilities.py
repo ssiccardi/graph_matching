@@ -384,6 +384,18 @@ def createTypeBucket(relL1, relL2):
         d[r.get("tipo")] = 0
     return d
 
+def createDFEnt(tipo, id1, id2, k1, k2, v1, v2)-> pd.DataFrame:
+
+    return pd.DataFrame({
+        "Tipo" : [tipo],
+        "IDG1" : [id1],
+        "AttributoG1" : [k1],
+        "ValoreG1" : [v1],
+        "IDG2" : [id2],
+        "AttributoG2" : [k2],
+        "ValoreG2" : [v2]
+        })
+
 def createDF(src: dict, dst: dict, rel1: int, rel2: int, tipo1: str, tipo2: str, ril: str)-> pd.DataFrame:
     l = []
     s = ""
