@@ -35,7 +35,10 @@ def entityMatching(ideng: int, conn: Connection):
         removeAttr(attrG1, toExaminG1)
         removeAttr(attrG2, toExaminG2)
 
+        
         for keyG1 in attrG1:
+            tmpRemove = None
+            tmpBool = False
             for keyG2 in attrG2:
                 if keyG1 == keyG2:
                     if attrG1.get(keyG1) == attrG2.get(keyG2):
@@ -51,11 +54,14 @@ def entityMatching(ideng: int, conn: Connection):
                             )
                         )
                     toRemoveG1.append(keyG1)
+                    tmpRemove = keyG1
+                    tmpBool = True
                     break
+            if tmpBool:
+                attrG2.pop(tmpRemove)
 
         for rem in toRemoveG1:
             attrG1.pop(rem)
-            attrG2.pop(rem)
 
         for key in attrG1:
             print(
