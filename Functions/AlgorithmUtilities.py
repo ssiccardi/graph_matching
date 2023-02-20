@@ -1,5 +1,5 @@
-from Functions.Relation import getLimit, isSemiFissa
 from Functions.Connection import Connection
+import pandas as pd 
 
 def isNode(el):
     return str(type(el)) == "<class 'neo4j.graph.Node'>"
@@ -11,6 +11,74 @@ def whichGraph(g):
         return "p.graph = 2 and "
     raise Exception("Errore con variabile", g, " -- Valore non ammesso")
 
+def getLimit(t: str, conn: Connection) -> int:
+    """Ottiene la Cardinalita per una relazione semifissa
+
+    Args:
+        t (str): nome della relazione
+        conn (Connectio): oggetto dedicato alla connessione a Neo4j
+
+    Returns:
+        int: Cardinalita relazione se presente, ?unknown? altrimenti
+    """
+    q = (
+        "MATCH (e) -[:HAS]-> (ee) WHERE e.label ='"
+        + t
+        + "' and labels(ee)[0] = 'Cardinalita' return properties(ee).label"
+    )
+    res = conn.query(q)
+    if res == None:
+        raise Exception("Errore per relazione di tipo {}".format(t))
+    return int(res.pop()[0])
+
+def isSemiFissa(t: str, conn: Connection) -> bool:
+    """Capisce se la relazione e' di tipo SemiFisso
+
+    Args:
+        t (str): nome della relazione
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Returns:
+        bool: True se SemiFissa, False altrimenti
+    """
+    q = (
+        "match (e) -[:HAS]-> (something) where e.label = '"
+        + t
+        + "' and labels(something)[0] = 'Cardinalita' return something.label <> '1' and something.label <> 'n'"
+    )
+    
+    res = conn.query(q)
+    if res == None:
+        raise Exception("Errore per relazione di tipo {}".format(t))
+    return res.pop()[0]  
+
+
+def getAttrId(id, conn: Connection) -> dict:
+    #TODO
+    d = {}
+    q = (
+        "match (p) where "
+        + "id(p) = "
+        + str(id)
+        + " return properties(p)"
+    )
+
+    result = conn.query(q) 
+
+    if result is None:
+        raise Exception("Errore con query" + q)
+
+    if len(result) < 1:  
+        return d
+
+    result = result.pop()  
+    result = result.get("properties(p)")
+
+    for e in result:  # itera sulle KEYS e poi estrapola dal nodo tramite key
+        if e != "graph" and e != "id":
+            d[e] = result.get(e)
+    
+    return dict(sorted(d.items()))  # ORA RITORNA UN DIZIONARIO
 
 def getAttr(ideng, g, conn: Connection):  
     """Ritorna una lista di chiavi valori con gli attributi
@@ -47,6 +115,38 @@ def getAttr(ideng, g, conn: Connection):
             d[e] = result.get(e)
     return dict(sorted(d.items()))  # ORA RITORNA UN DIZIONARIO
 
+def getIdenNameId(id, conn: Connection) -> list:
+    #TODO
+    l = list()
+    q = (
+        "match (p) where "
+        + "id(p) = "
+        + str(id)
+        + " return labels(p)"
+    )
+    result = conn.query(q)  
+
+    if result is None:
+        raise Exception("Errore con query" + q)
+
+    if len(result) == 0:
+        return l
+        
+    res = result.pop()[0][0]  
+    q = (
+        "match (:"
+        + res
+        + ") -[:IDENTIFIED]-> (:Identifier) -[:IDENTIFIED_BY]-> (p) return p.label as iden"
+    )
+    result = conn.query(q)  
+
+    if result is None:
+        raise Exception("Errore con query" + q)
+
+    for res in result:  
+        l.append(res[0])
+    l.sort()
+    return l
 
 def getIdenName(ideng, g, conn : Connection):
     """Ritorna una lista di attributi identitari
@@ -205,6 +305,7 @@ def getRel(id, grafo, direzione: int, conn: Connection):
         + str(id)
         + " RETURN id(r) as id, type(r) as tipo, id(startNode(r)) as da, id(endNode(r)) as a"
     )
+    
     result = conn.query(q) 
     
     if result is None:
@@ -256,45 +357,6 @@ def sameRel(r1, r2, id, direzione: int, conn: Connection):
 
     return res.pop()[0]  
 
-
-# @param(r1, r2) id delle relazioni
-# return --> true se la relazione ha la stessa entita' di arrivo, false altrimenti
-def sameTarget(r1, r2, conn: Connection):
-    q = (
-        "match () -[r]-> (e) where id(r) = "
-        + str(r1)
-        + " with e.id as id1 match () -[r]-> (e) where id(r) = "
-        + str(r2)
-        + " return e.id = id1"
-    )
-    
-    res = conn.query(q)
-
-    if res is None:
-        raise Exception("Errore con query" + q)
-
-    return res.pop()[0]  
-
-
-# @param(r1, r2) id delle relazioni
-# return --> true se la relazione ha la stessa entita' di partenza, false altrimenti
-def sameSource(r1, r2, conn: Connection):
-    q = (
-        "match (e) -[r]-> () where id(r) = "
-        + str(r1)
-        + " with e.id as id1 match (e) -[r]-> () where id(r) = "
-        + str(r2)
-        + " return e.id = id1"
-    )
-    
-    res = conn.query(q)
-
-    if res is None:
-        raise Exception("Errore con query" + q)
-
-    return res.pop()[0]  
-
-
 # crea stringhe dove segnali coincidenze o complementarità' se non sopra limite, contraddittorietà' altrimenti
 def overLimit(tipo, val, l1, l2, conn: Connection):
     #TODO l1 e l2 servono?
@@ -321,3 +383,24 @@ def createTypeBucket(relL1, relL2):
     for r in relL2:
         d[r.get("tipo")] = 0
     return d
+
+def createDF(src: dict, dst: dict, rel1: int, rel2: int, tipo1: str, tipo2: str, ril: str)-> pd.DataFrame:
+    l = []
+    s = ""
+    if src is not None:
+        for key in src.keys(): s += str(key) + " : " + str(src.get(key)) + " -- "
+    l.append(s) 
+    s = ""
+    if dst is not None:
+        for key in dst.keys(): s += str(key) + " : " + str(dst.get(key)) + " -- "
+    l.append(s) 
+
+    return pd.DataFrame({
+        "Tipo" : [ril],
+        "IDRelazioneG1" : [rel1],
+        "TipoRelG1" : [tipo1],
+        "IDRelazioneG2" : [rel2],
+        "TipoRelG2" : [tipo2],
+        "Attr. G1" : [l[0]],
+        "Attr. G2" : [l[1]]
+        })
