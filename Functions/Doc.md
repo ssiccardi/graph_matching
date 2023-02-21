@@ -1,29 +1,6 @@
 ## Directory Functions 
 
- ### File DbUtilities.py 
-
- 
-
- ### Function Header --> 
-
-` getEntityId(t: str, attr: dict, graph, conn: Connection)-> int:
-    ` 
-
- - Ottieni l'ID automatico dato da Neo4j al momento dell'inserimento
-- Args:
-  - t (str): tipo dell'entita'
-  - attr (dict): key-value attributes
-  - graph (str or int): identificatore grafo di appartenenza
-  - conn (Connection): oggetto dedicato alla connessione a Neo4j
-- Raises:
-  - Exception: quando troviamo piu' entita' con stessi parametri
-- Returns:
-  - int: ID entita' riconosciuta dai parametri
- 
-
- <hr> 
-
-### File Connection.py 
+ ### File Connection.py 
 
  
 
@@ -42,88 +19,25 @@
 
  <hr> 
 
-### File AlgorithmUtilities.py 
+### File DbUtilities.py 
 
  
 
  ### Function Header --> 
 
-` getLimit(t: str, conn: Connection) -> int:
+` getEntityId(t: str, attr: dict, graph, conn: Connection)-> int:
     ` 
 
- - Ottiene la Cardinalita per una relazione semifissa
+ - Ottieni l'ID automatico dato da Neo4j al momento dell'inserimento
 - Args:
-  - t (str): nome della relazione
-  - conn (Connectio): oggetto dedicato alla connessione a Neo4j
-- Returns:
-  - int: Cardinalita relazione se presente, ?unknown? altrimenti
-
-
- ### Function Header --> 
-
-` isSemiFissa(t: str, conn: Connection) -> bool:
-    ` 
-
- - Capisce se la relazione e' di tipo SemiFisso
-- Args:
-  - t (str): nome della relazione
+  - t (str): tipo dell'entita'
+  - attr (dict): key-value attributes
+  - graph (str or int): identificatore grafo di appartenenza
   - conn (Connection): oggetto dedicato alla connessione a Neo4j
+- Raises:
+  - Exception: quando troviamo piu' entita' con stessi parametri
 - Returns:
-  - bool: True se SemiFissa, False altrimenti
-
-
- ### Function Header --> 
-
-` getAttr(ideng, g, conn: Connection):  
-    ` 
-
- - Ritorna una lista di chiavi valori con gli attributi
-- Args:
-  - ideng (int): id dell'entita'
-  - g (str): grafo da cui prendere gli attributi
-  - conn (Connection): oggetto dedicato alla connessione a Neo4j
-- Returns:
-  - dict: key-value attributes
-
-
- ### Function Header --> 
-
-` getIdenName(ideng, g, conn : Connection):
-    ` 
-
- - Ritorna una lista di attributi identitari
-- Args:
-  - ideng (int): id dell'entita'
-  - g (str): grafo da cui prendere gli attributi
-  - conn (Connection): oggetto dedicato alla connessione a Neo4j
-- Returns:
-  - list: attributi identitari
-
-
- ### Function Header --> 
-
-` onlySemi(lista, conn: Connection):
-    ` 
-
- - Filtra le relazioni non SemiFisse
-- Args:
-  - lista (list): lista di relazioni
-  - conn (Connection): oggetto dedicato alla connessione a Neo4j
-- Returns:
-  - list: lista di relazioni SemiFisse
-
-
- ### Function Header --> 
-
-` deleteSemi(lista, conn: Connection):
-    ` 
-
- - Filtra le relazioni SemiFisse
-- Args:
-  - lista (list): lista di relazioni
-  - conn (Connection): oggetto dedicato alla connessione a Neo4j
-- Returns:
-  - list: lista di relazioni SemiFisse
+  - int: ID entita' riconosciuta dai parametri
  
 
  <hr> 
@@ -394,34 +308,21 @@
 
  <hr> 
 
-### File RelationMatching.py 
+### File EntityMatching.py 
 
  
 
  ### Function Header --> 
 
-` getInfoSemi(id: int, conn: Connection, df: pd.DataFrame) -> pd.DataFrame:
+` entityMatching(ideng: int, conn: Connection):
     ` 
 
- - Analizza le relazioni SemiFisse legate all'id passato in input, mostrando all'utente cosa nota
+ - Analizza due entita' e i loro attributi in due sottografi differenti
 - Args:
-  - id (int): id appartenente all'entita' da analizzare\n
+  - ideng (int): id dell'entita', deve esistere
   - conn (Connection): oggetto dedicato alla connessione a Neo4j
-
-
- ### Function Header --> 
-
-` relationMatching(id: int, conn: Connection):
-    ` 
-
- - Analizza le relazioni legate all'id passato in input, mostrando all'utente cosa nota\n
-  - PreCondizioni:
-  - 1)Le entita' esistono e non sono contraddittorie\n
-  - 2)Le relazioni fisse hanno subito un controllo in inserimento, non ci possono essere piu' relazioni fisse uguali appartenenti alla stessa entita' di uno stesso grafo\n
-  - 3)Le relazioni semifisse hanno subito lo stesso controllo in inserimento!\n
-  - Args:
-  - id (int): [id appartenente all'entita' da analizzare]\n
-  - conn (Connection): [oggetto dedicato alla connessione a Neo4j]
+- Returns:
+  - str: esito dell'analisi
  
 
  <hr> 
@@ -494,21 +395,120 @@
 
  <hr> 
 
-### File EntityMatching.py 
+### File AlgorithmUtilities.py 
 
  
 
  ### Function Header --> 
 
-` entityMatching(ideng: int, conn: Connection):
+` getLimit(t: str, conn: Connection) -> int:
     ` 
 
- - Analizza due entita' e i loro attributi in due sottografi differenti
+ - Ottiene la Cardinalita per una relazione semifissa
 - Args:
-  - ideng (int): id dell'entita', deve esistere
+  - t (str): nome della relazione
+  - conn (Connectio): oggetto dedicato alla connessione a Neo4j
+- Returns:
+  - int: Cardinalita relazione se presente, ?unknown? altrimenti
+
+
+ ### Function Header --> 
+
+` isSemiFissa(t: str, conn: Connection) -> bool:
+    ` 
+
+ - Capisce se la relazione e' di tipo SemiFisso
+- Args:
+  - t (str): nome della relazione
   - conn (Connection): oggetto dedicato alla connessione a Neo4j
 - Returns:
-  - str: esito dell'analisi
+  - bool: True se SemiFissa, False altrimenti
+
+
+ ### Function Header --> 
+
+` getAttr(ideng, g, conn: Connection):  
+    ` 
+
+ - Ritorna una lista di chiavi valori con gli attributi
+- Args:
+  - ideng (int): id dell'entita'
+  - g (str): grafo da cui prendere gli attributi
+  - conn (Connection): oggetto dedicato alla connessione a Neo4j
+- Returns:
+  - dict: key-value attributes
+
+
+ ### Function Header --> 
+
+` getIdenName(ideng, g, conn : Connection):
+    ` 
+
+ - Ritorna una lista di attributi identitari
+- Args:
+  - ideng (int): id dell'entita'
+  - g (str): grafo da cui prendere gli attributi
+  - conn (Connection): oggetto dedicato alla connessione a Neo4j
+- Returns:
+  - list: attributi identitari
+
+
+ ### Function Header --> 
+
+` onlySemi(lista, conn: Connection):
+    ` 
+
+ - Filtra le relazioni non SemiFisse
+- Args:
+  - lista (list): lista di relazioni
+  - conn (Connection): oggetto dedicato alla connessione a Neo4j
+- Returns:
+  - list: lista di relazioni SemiFisse
+
+
+ ### Function Header --> 
+
+` deleteSemi(lista, conn: Connection):
+    ` 
+
+ - Filtra le relazioni SemiFisse
+- Args:
+  - lista (list): lista di relazioni
+  - conn (Connection): oggetto dedicato alla connessione a Neo4j
+- Returns:
+  - list: lista di relazioni SemiFisse
+ 
+
+ <hr> 
+
+### File RelationMatching.py 
+
+ 
+
+ ### Function Header --> 
+
+` getInfoSemi(id: int, conn: Connection, df: pd.DataFrame) -> pd.DataFrame:
+    ` 
+
+ - Analizza le relazioni SemiFisse legate all'id passato in input, mostrando all'utente cosa nota
+- Args:
+  - id (int): id appartenente all'entita' da analizzare\n
+  - conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+
+ ### Function Header --> 
+
+` relationMatching(id: int, conn: Connection):
+    ` 
+
+ - Analizza le relazioni legate all'id passato in input, mostrando all'utente cosa nota\n
+  - PreCondizioni:
+  - 1)Le entita' esistono e non sono contraddittorie\n
+  - 2)Le relazioni fisse hanno subito un controllo in inserimento, non ci possono essere piu' relazioni fisse uguali appartenenti alla stessa entita' di uno stesso grafo\n
+  - 3)Le relazioni semifisse hanno subito lo stesso controllo in inserimento!\n
+  - Args:
+  - id (int): [id appartenente all'entita' da analizzare]\n
+  - conn (Connection): [oggetto dedicato alla connessione a Neo4j]
  
 
  <hr> 
