@@ -5,7 +5,6 @@
 0,Coincidente,146,PADRE_DI,158,PADRE_DI,Tipo : Person -- id : 3 -- Surname : Masolini -- graph : 1 -- Name : Fabio -- ,Tipo : Person -- id : 3 -- Surname : Masolini -- graph : 2 -- Name : Fabio -- 
 0,Contraddittoria,147,MADRE_DI,157,MADRE_DI,Tipo : Person -- id : 2 -- Surname : Scaramellini -- graph : 1 -- Name : Paola -- ,Tipo : Person -- id : 2 -- Surname : Scaramellini -- graph : 2 -- Name : Pina -- 
 0,Contraddittoria diretta,152,ZIO_DI,161,ZIA_DI,Tipo : Person -- id : 12 -- Surname : Scaramellini -- graph : 1 -- Name : Michela -- ,Tipo : Person -- id : 6 -- Surname : Scaramellini -- graph : 2 -- Name : Michela -- 
-0,Complementare Grafo1,153,ZIA_DI,-1,,Tipo : Person -- id : 8 -- Surname : Masolini -- graph : 1 -- Name : Marilena -- ,
 0,Complementare Grafo2,163,MOGLIE_DI,-1,,Tipo : Person -- id : 8 -- Surname : y -- graph : 2 -- Name : y -- ,
 0,Complementare Grafo1,149,NONNA_DI,-1,,Tipo : Person -- id : 5 -- Surname : Balatti -- graph : 1 -- Name : Aneli -- ,
 0,Complementare Grafo1,150,NONNO_DI,-1,,Tipo : Person -- id : 6 -- Surname : Masolini -- graph : 1 -- Name : Lino -- ,

@@ -56,7 +56,7 @@ def getInfoSemi(id: int, conn: Connection, df: pd.DataFrame) -> pd.DataFrame:
                     toRem.append(r2)
             if len(toRem) > 0: #rimozione scadute in relE2
                 for rem in toRem:
-                    relE2.pop(rem)
+                    relE2.remove(rem)
                 toRem = list()
             if b:
                 # COMPLEMENTARI
@@ -91,7 +91,7 @@ def getInfoSemi(id: int, conn: Connection, df: pd.DataFrame) -> pd.DataFrame:
                     toRem.append(r2)       
             if len(toRem) > 0: #rimozione scadute in relP2
                 for rem in toRem:
-                    relP2.pop(rem)
+                    relP2.remove(rem)
                 toRem = list() 
             if b:
                 src = getEntity(r1.get('a'), conn)
@@ -139,7 +139,7 @@ def relationMatching(id: int, conn: Connection):
                     toRem.append(rel2)
             if len(toRem) > 0: #rimozione scadute in relP2
                 for rem in toRem:
-                    relP2.pop(rem)
+                    relP2.remove(rem)
                 toRem = list()
             if compl:# COMPLEMENTARE
                 src = getEntity(rel1.get('a'), conn)
@@ -185,7 +185,7 @@ def relationMatching(id: int, conn: Connection):
                     toRem.append(rel2)
             if len(toRem) > 0: #rimozione scadute e contraddittorie dirette in relE2
                 for rem in toRem:
-                    relE2.pop(rem)
+                    relE2.remove(rem)
                 toRem = list()
             if compl: # COMPLEMENTARE
                 src = getEntity(rel1.get('da'), conn)
