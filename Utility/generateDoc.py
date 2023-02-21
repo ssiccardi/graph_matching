@@ -22,7 +22,7 @@ def scanFile(fName: str, dirName: str)-> str:
     s = ""
     fileContent = f.read()
 
-    for line in fileContent.split("def"):
+    for line in fileContent.split("def "):
         if line.__contains__("\"\"\""):
             line = line.split("\"\"\"")
             func, docs = line[0], line[1]

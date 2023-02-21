@@ -6,7 +6,7 @@
 
  ### Function Header --> 
 
-` query(self, query: str, db=None):
+`query(self, query: str, db=None):
         ` 
 
  - Permette di interrogare il database, senza controlli in input
@@ -25,7 +25,7 @@
 
  ### Function Header --> 
 
-` getEntityId(t: str, attr: dict, graph, conn: Connection)-> int:
+`getEntityId(t: str, attr: dict, graph, conn: Connection)-> int:
     ` 
 
  - Ottieni l'ID automatico dato da Neo4j al momento dell'inserimento
@@ -48,7 +48,7 @@
 
  ### Function Header --> 
 
-` sameSource(r1, r2, conn: Connection)-> bool:
+`sameSource(r1, r2, conn: Connection)-> bool:
     ` 
 
  - Stabilisce sue due relazioni hanno la stessa entita' sorgente sulla base degli id extra
@@ -64,7 +64,7 @@
 
  ### Function Header --> 
 
-` sameTarget(r1, r2, conn: Connection) -> bool:
+`sameTarget(r1, r2, conn: Connection) -> bool:
     ` 
 
  - Stabilisce sue due relazioni hanno la stessa entita' target sulla base degli id extra
@@ -80,7 +80,7 @@
 
  ### Function Header --> 
 
-` isFissa(t: str, conn: Connection) -> bool:
+`isFissa(t: str, conn: Connection) -> bool:
     ` 
 
  - Capisce se la relazione e' di tipo Fisso
@@ -93,7 +93,7 @@
 
  ### Function Header --> 
 
-` isMultipla(t: str, conn: Connection) -> bool:
+`isMultipla(t: str, conn: Connection) -> bool:
     ` 
 
  - Capisce se la relazione e' di tipo Multiplo
@@ -106,7 +106,7 @@
 
  ### Function Header --> 
 
-` getScadute(idDst, relName: str, conn: Connection)-> int:
+`getScadute(idDst, relName: str, conn: Connection)-> int:
     ` 
 
  - Conta il numero di relazioni di tipo indicato, che arrivano all'entita' indicata, sono scadute
@@ -120,7 +120,7 @@
 
  ### Function Header --> 
 
-` canCreate(idDst, relName: str, conn: Connection, scadenza = None) -> bool:
+`canCreate(idDst, relName: str, conn: Connection, scadenza = None) -> bool:
     ` 
 
  - Capisce se la relazione tra le due entita' puo' essere creata. Quindi si chiede se tra le due e' gia' presente la relazione, se attiverebbe contraddizioni e cosi' via
@@ -134,7 +134,7 @@
 
  ### Function Header --> 
 
-` addRelAttribute(conn: Connection, t: str, attribute: str):
+`addRelAttribute(conn: Connection, t: str, attribute: str):
     ` 
 
  - Aggiunge un'attributo al metamodello di una relazione
@@ -146,7 +146,7 @@
 
  ### Function Header --> 
 
-` alreadyExist(t1: str, t2: str, t: str, conn: Connection) -> bool:
+`alreadyExist(t1: str, t2: str, t: str, conn: Connection) -> bool:
     ` 
 
  - funzione di utility per vedere se due metamodelli sono gia' collegati da una relazione di tipo t
@@ -161,7 +161,7 @@
 
  ### Function Header --> 
 
-` addConstraint(relType1: str, relType2: str, relType: str, conn) -> bool:
+`addConstraint(relType1: str, relType2: str, relType: str, conn) -> bool:
     ` 
 
  - Aggiunge un link, con nome specificato in relType, tra metamodelli (se non esiste gia')
@@ -176,7 +176,7 @@
 
  ### Function Header --> 
 
-` getContraddictory(par, t: int, conn: Connection) -> list:
+`getContraddictory(par, t: int, conn: Connection) -> list:
     ` 
 
  - Ottiene relazioni contraddittorie
@@ -192,7 +192,7 @@
 
  ### Function Header --> 
 
-` srcCheck(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool:
+`srcCheck(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool:
     ` 
 
  - Controlla se esiste rel tra le due entita'
@@ -207,7 +207,7 @@
 
  ### Function Header --> 
 
-` alreadyLinked(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool:
+`alreadyLinked(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool:
     ` 
 
  - Controlla se esiste rel tra le due entita'
@@ -222,39 +222,22 @@
 
  ### Function Header --> 
 
-` checkInsertion(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool:
+`checkInsertion(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool:
     ` 
 
- - Controlla che non avvengano inserimenti contraddittori / non sia gia' presente
+ - Controlla che non avvengano inserimenti contraddittori (o non sia gia' presente)
 - Args:
   - entSrc (int): deve essere un intero indicante un'entita' esistente all'interno del db
   - entDst (int): deve essere un intero indicante un'entita' esistente all'interno del db
+  - rel (str): deve essere una stringa rappresentate una relazione che ha un metamodello definito
+  - conn (Connection): oggetto dedicato alla connessione a Neo4j
+- Returns:
+  - bool: True se esiste, False altrimenti
 
 
  ### Function Header --> 
 
-`inito
-        conn (Connection): oggetto dedicato alla connessione a Neo4j
-
-    Returns:
-        bool: True se inseribile, False altrimenti
-    ` 
-
- - 
-  - if alreadyLinked(entSrc, entDst, rel, conn):
-  - return False
-- presentContr = getContraddictory(rel, 1, conn)
-  - # ottengo tutte le relazioni in contraddizioni con quella da inserire
-- for p in presentContr:  # si controlla se nell'entita' sorgente e' presente questa relazione in contraddizione con quella da inserire
-  - if alreadyLinked(entSrc, entDst, p, conn):
-  - return False
-- return True
-- #SOLO PER ENTRANTI
-
-
- ### Function Header --> 
-
-` create_relation_dir(typeES: str, ES_attr: dict, gS, typeET: str, ET_attr: dict, gT, relName: str, conn: Connection) -> str:
+`create_relation_dir(typeES: str, ES_attr: dict, gS, typeET: str, ET_attr: dict, gT, relName: str, conn: Connection) -> str:
     ` 
 
  - Crea, se possibile, una relazione tra l'entita' sorgente e quella destinazione, riconosciute tramite i parametri passati, con nome specificato
@@ -273,7 +256,7 @@
 
  ### Function Header --> 
 
-` create_relation_with_attribute(typeES: str, ES_attr: dict, gS, typeET: str, ET_attr: dict, gT, relName: str, relAttr: dict, conn: Connection) -> str:
+`create_relation_with_attribute(typeES: str, ES_attr: dict, gS, typeET: str, ET_attr: dict, gT, relName: str, relAttr: dict, conn: Connection) -> str:
     ` 
 
  - Crea, se possibile, una relazione tra l'entita' sorgente e quella destinazione, riconosciute tramite i parametri passati, con nome e con attributi specificati
@@ -293,7 +276,7 @@
 
  ### Function Header --> 
 
-` isOver(relID, conn: Connection):
+`isOver(relID, conn: Connection):
     ` 
 
  - Controlla se la relazione e' scaduta
@@ -314,7 +297,7 @@
 
  ### Function Header --> 
 
-` entityMatching(ideng: int, conn: Connection):
+`entityMatching(ideng: int, conn: Connection):
     ` 
 
  - Analizza due entita' e i loro attributi in due sottografi differenti
@@ -333,7 +316,7 @@
 
  ### Function Header --> 
 
-` relazione(conn: Connection, nome: str, riflessiva: int, card):
+`relazione(conn: Connection, nome: str, riflessiva: int, card):
     ` 
 
  - Definisce un metamodello per una relazione
@@ -352,7 +335,7 @@
 
  ### Function Header --> 
 
-` create_instance_mine(conn: Connection, t, attributes, graph, id):
+`create_instance_mine(conn: Connection, t, attributes, graph, id):
     ` 
 
  - Crea un'entita' con attributi dati, nel grafo dato e di tipologia data. Inoltre permette di specificare un id extra
@@ -368,7 +351,7 @@
 
  ### Function Header --> 
 
-` delete_instance(conn: Connection, t: str, attributes: dict):
+`delete_instance(conn: Connection, t: str, attributes: dict):
     ` 
 
  - Elimina un'entita' con attributi dati e di tipologia data. IN ENTRAMBI I GRAFI
@@ -382,7 +365,7 @@
 
  ### Function Header --> 
 
-` delete_instance_id(conn: Connection, id: int):
+`delete_instance_id(conn: Connection, id: int):
     ` 
 
  - Elimina un'entita' con attributi dati e di tipologia data. IN ENTRAMBI I GRAFI
@@ -401,7 +384,7 @@
 
  ### Function Header --> 
 
-` getLimit(t: str, conn: Connection) -> int:
+`getLimit(t: str, conn: Connection) -> int:
     ` 
 
  - Ottiene la Cardinalita per una relazione semifissa
@@ -414,7 +397,7 @@
 
  ### Function Header --> 
 
-` isSemiFissa(t: str, conn: Connection) -> bool:
+`isSemiFissa(t: str, conn: Connection) -> bool:
     ` 
 
  - Capisce se la relazione e' di tipo SemiFisso
@@ -427,7 +410,7 @@
 
  ### Function Header --> 
 
-` getAttr(ideng, g, conn: Connection):  
+`getAttr(ideng, g, conn: Connection):  
     ` 
 
  - Ritorna una lista di chiavi valori con gli attributi
@@ -441,7 +424,7 @@
 
  ### Function Header --> 
 
-` getIdenName(ideng, g, conn : Connection):
+`getIdenName(ideng, g, conn : Connection):
     ` 
 
  - Ritorna una lista di attributi identitari
@@ -455,7 +438,7 @@
 
  ### Function Header --> 
 
-` onlySemi(lista, conn: Connection):
+`onlySemi(lista, conn: Connection):
     ` 
 
  - Filtra le relazioni non SemiFisse
@@ -468,7 +451,7 @@
 
  ### Function Header --> 
 
-` deleteSemi(lista, conn: Connection):
+`deleteSemi(lista, conn: Connection):
     ` 
 
  - Filtra le relazioni SemiFisse
@@ -487,7 +470,7 @@
 
  ### Function Header --> 
 
-` getInfoSemi(id: int, conn: Connection, df: pd.DataFrame) -> pd.DataFrame:
+`getInfoSemi(id: int, conn: Connection, df: pd.DataFrame) -> pd.DataFrame:
     ` 
 
  - Analizza le relazioni SemiFisse legate all'id passato in input, mostrando all'utente cosa nota
@@ -498,7 +481,7 @@
 
  ### Function Header --> 
 
-` relationMatching(id: int, conn: Connection):
+`relationMatching(id: int, conn: Connection):
     ` 
 
  - Analizza le relazioni legate all'id passato in input, mostrando all'utente cosa nota\n

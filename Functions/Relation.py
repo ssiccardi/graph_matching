@@ -427,7 +427,7 @@ def alreadyLinked(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool:
     return res[0][0] 
 
 def checkInsertion(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool:
-    """Controlla che non avvengano inserimenti contraddittori / non sia gia' presente
+    """Controlla che non avvengano inserimenti contraddittori (o non sia gia' presente)
 
     Args:
         entSrc (int): deve essere un intero indicante un'entita' esistente all'interno del db
@@ -436,13 +436,13 @@ def checkInsertion(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool
         conn (Connection): oggetto dedicato alla connessione a Neo4j
 
     Returns:
-        bool: True se inseribile, False altrimenti
+        bool: True se esiste, False altrimenti
     """
     if alreadyLinked(entSrc, entDst, rel, conn):
         return False
 
     presentContr = getContraddictory(rel, 1, conn)
-    # ottengo tutte le relazioni in contraddizioni con quella da inserire
+    #ottengo tutte le relazioni in contraddizioni con quella da inserire
 
     for p in presentContr:  # si controlla se nell'entita' sorgente e' presente questa relazione in contraddizione con quella da inserire
         if alreadyLinked(entSrc, entDst, p, conn):
@@ -450,8 +450,8 @@ def checkInsertion(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool
 
     return True
 
-#SOLO PER ENTRANTI
 def areDirectlyContraddictory(relType1: str, relType2:str, idR1, idR2, conn: Connection) -> bool:
+    #SOLO PER ENTRANTI
     if relType1 == relType2 or not sameSourceIden(idR1, idR2, conn):
         return False
     
