@@ -1,7 +1,6 @@
 import neo4j
 from Functions.Connection import Connection
 
-# @title util to create istanze
 def check_metamodello(conn: Connection, t:str, key):
     with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
         with session.begin_transaction() as tx:
@@ -127,32 +126,3 @@ def get_identifiable_attributes(conn: Connection, t: str):
             tx.close()
 
     return identifiable_attributes
-
-def getEntityId(t: str, attr: dict, graph, conn: Connection)-> int:
-    """Ottieni l'ID automatico dato da Neo4j al momento dell'inserimento
-
-    Args:
-        t (str): tipo dell'entita'
-        attr (dict): key-value attributes
-        graph (str or int): identificatore grafo di appartenenza 
-        conn (Connection): oggetto dedicato alla connessione a Neo4j
-
-    Raises:
-        Exception: quando troviamo piu' entita' con stessi parametri
-
-    Returns:
-        int: ID entita' riconosciuta dai parametri
-    """    
-    q = "MATCH (e:" + t + " { graph:" + str(graph)
-    for el in attr.items():
-        q += ", " + el[0] + ': "' + el[1] + '"'
-    q += "}) return id(e)"
-    res = conn.query(q) 
-    
-    if res is None:
-        raise Exception("Errore nel trovare un ID per entita' di tipo {}, con attributi {}, nel grafo {}".format(t, attr, graph))
-    
-    if len(res) != 1: 
-        raise Exception("Questa entita' non e' unica, impossibile recuperare l'ID per entita' di tipo {}, con attributi {}, nel grafo {}\n\n{}".format(t, attr, graph, q))
-    
-    return res[0][0] 
