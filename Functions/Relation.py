@@ -1,5 +1,5 @@
 from Functions.AlgorithmUtilities import getIdenNameId, getAttrId, getLimit
-from Functions.DbUtilities import getEntityId
+from Functions.Entity import getEntityId
 from Functions.Connection import Connection
 from datetime import date
 import neo4j

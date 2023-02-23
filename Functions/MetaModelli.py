@@ -2,7 +2,6 @@ import neo4j
 from Functions.DbUtilities import check_metamodello
 from Functions.Connection import Connection
 
-# @title PERSONA
 def metamodelloPersona(conn: Connection):
     with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
         with session.begin_transaction() as tx:
@@ -31,8 +30,6 @@ def metamodelloPersona(conn: Connection):
             tx.commit()
             tx.close()
 
-
-# @title SOCIETÁ
 def metamodelloSocieta(conn: Connection):
     with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
         with session.begin_transaction() as tx:
@@ -52,8 +49,6 @@ def metamodelloSocieta(conn: Connection):
             tx.commit()
             tx.close()
 
-
-# @title LUOGO
 def metamodelloLuogo(conn: Connection):
     with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
         with session.begin_transaction() as tx:
@@ -73,8 +68,6 @@ def metamodelloLuogo(conn: Connection):
             tx.commit()
             tx.close()
 
-
-# @title INDIRIZZO
 def metamodelloIndirizzo(conn: Connection):
     with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
         with session.begin_transaction() as tx:
@@ -94,8 +87,6 @@ def metamodelloIndirizzo(conn: Connection):
             tx.commit()
             tx.close()
 
-
-# AGGIUNGERE TIPI
 def addType(conn: Connection, t: str):
     with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
         with session.begin_transaction() as tx:
@@ -128,8 +119,6 @@ def addType(conn: Connection, t: str):
             elif flag == "n":
                 print("Operation aborted.")
 
-
-# AGGIUNGERE ATTRIBUTI
 def addAttribute(conn: Connection, t: str, attribute: str):
     with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
         with session.begin_transaction() as tx:
@@ -191,8 +180,6 @@ def addAttribute(conn: Connection, t: str, attribute: str):
             elif flag == "n":
                 print("Operation aborted.")
 
-
-# AGGIUNTA IDENTIFICATORI:
 def addIdentifier(conn: Connection, t: str, attribute: str):
     with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
         with session.begin_transaction() as tx:
@@ -252,7 +239,6 @@ def addIdentifier(conn: Connection, t: str, attribute: str):
 
             elif flag == "n":
                 print("Operation aborted")
-
 
 def relazione(conn: Connection, nome: str, riflessiva: int, card):
     """Definisce un metamodello per una relazione

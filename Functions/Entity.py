@@ -3,7 +3,6 @@ import pandas as pd
 from Functions.DbUtilities import check_instance, legal_attributes, stringify_attributes
 from Functions.Connection import Connection
 
-# @title CREA ISTANZA CON ID MIO
 def create_instance_mine(conn: Connection, t, attributes, graph, id):
     """Crea un'entita' con attributi dati, nel grafo dato e di tipologia data. Inoltre permette di specificare un id extra
 
@@ -115,3 +114,33 @@ def getEntity(id: int, conn : Connection) -> dict:
         d[key] = res[0][0].get(key)
         
     return d
+
+
+def getEntityId(t: str, attr: dict, graph, conn: Connection)-> int:
+    """Ottieni l'ID automatico dato da Neo4j al momento dell'inserimento
+
+    Args:
+        t (str): tipo dell'entita'
+        attr (dict): key-value attributes
+        graph (str or int): identificatore grafo di appartenenza 
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Raises:
+        Exception: quando troviamo piu' entita' con stessi parametri
+
+    Returns:
+        int: ID entita' riconosciuta dai parametri
+    """    
+    q = "MATCH (e:" + t + " { graph:" + str(graph)
+    for el in attr.items():
+        q += ", " + el[0] + ': "' + el[1] + '"'
+    q += "}) return id(e)"
+    res = conn.query(q) 
+    
+    if res is None:
+        raise Exception("Errore nel trovare un ID per entita' di tipo {}, con attributi {}, nel grafo {}".format(t, attr, graph))
+    
+    if len(res) != 1: 
+        raise Exception("Questa entita' non e' unica, impossibile recuperare l'ID per entita' di tipo {}, con attributi {}, nel grafo {}\n\n{}".format(t, attr, graph, q))
+    
+    return res[0][0] 

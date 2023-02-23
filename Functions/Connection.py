@@ -1,5 +1,5 @@
 from neo4j import GraphDatabase
-import pandas as pd
+
 class Connection:
 
     def __init__(self, uri: str, user: str, password: str):
