@@ -86,7 +86,7 @@ def entityMatching(ideng: int, conn: Connection):
                     key, attrG1.get(key)
                 )
             )
-            df = pd.concat([df, createDF_Entity(cfr="Complementare", typeEnt=tipo1, id1=id1, id2=id2, typeAttr1=key, valueAttr1=str(attrG1.get(key)))], axis=0)
+            df = pd.concat([df, createDF_Entity(cfr="Complementare", typeEnt=tipo1, id1=id1, typeAttr1=key, valueAttr1=str(attrG1.get(key)))], axis=0)
 
         for key in attrG2:
             print(
@@ -94,7 +94,7 @@ def entityMatching(ideng: int, conn: Connection):
                     key, attrG2.get(key)
                 )
             )
-            df = pd.concat([df, createDF_Entity(cfr="Complementare", typeEnt=tipo1, id1=id1, id2=id2, typeAttr2=key, valueAttr2=str(attrG2.get(key)))], axis=0)
+            df = pd.concat([df, createDF_Entity(cfr="Complementare", typeEnt=tipo1, id2=id2, typeAttr2=key, valueAttr2=str(attrG2.get(key)))], axis=0)
                 
         f = open("/home/pietro/graph_matching/Contents/EntityMatchingAnalisi.csv", "w")
         f.write(df.to_csv())

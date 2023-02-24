@@ -110,8 +110,7 @@ def getAttr(ideng, g, conn: Connection):
     
     d["tipo"] = result.__getitem__(0).get("tipo")[0]
     d["idDB"] = result.__getitem__(0).get("id(p)")
-    result = result.pop()  
-    result = result.get("properties(p)")
+    result = result.__getitem__(0).get("properties(p)")
     for e in result:  # itera sulle KEYS e poi estrapola dal nodo tramite key
         if e != "graph" and e != "id":
             d[e] = result.get(e)
