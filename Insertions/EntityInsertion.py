@@ -32,4 +32,4 @@ create_instance_mine(conn, "Person", {"Name" : "y", "Surname" : "y"}, 2, 8)
 create_instance_mine(conn, "Person", {"Name" : "f", "Surname" : "f"}, 2, 9)
 create_instance_mine(conn, "Person", {"Name" : "Celeste", "Surname" : "Bellosi"}, 2, 10)
 
-conn.close()
+conn.close() 
