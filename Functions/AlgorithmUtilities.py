@@ -193,7 +193,8 @@ def getIdenName(ideng, g, conn : Connection):
 
 
 def canProceed(ideng, conn: Connection):
-    # PARTI DA PRESUPPOSTO entita' abbiano un codice identificativo e che quindi in input ci sia solo un ideng
+    # PARTI DA PRESUPPOSTO entita' abbiano un codice identificativo 
+    # e che quindi in input ci sia solo un ideng
     res = conn.query("MATCH (e) WHERE e.id = " + str(ideng) + " RETURN COUNT(e) as ents")
     
     if res is None:
@@ -428,6 +429,16 @@ def createTypeBucket(relL1, relL2):
         d[r.get("tipo")] = 0
     return d
 
+def createDF_Entity(cfr: str, typeEnt1: str = " ", typeEnt2: str = " ", id1: int = -1, id2: int = -1, typeAttr1: str = " ", 
+                    typeAttr2: str = " ", valueAttr1: str = " ", valueAttr2: str = " ")-> pd.DataFrame :
+    return pd.DataFrame({
+            "Descrizione confronto attributo" : [cfr],
+            "Tipo Entità Grafo1" :  [typeEnt1], "ID Entità Grafo1" : [id1], 
+            "Tipo attributo Entità Grafo1" : [typeAttr1], "Attributo Entità Grafo1" : [valueAttr1],
+            "Tipo Entità Grafo2" : [typeEnt2], "ID Entità Grafo2" : [id2], 
+            "Tipo attributo Entità Grafo2" : [typeAttr2], "Attributo Entità Grafo2" : [valueAttr2]
+    })
+    
 def createDF(src: dict, dst: dict, rel1: int, rel2: int, tipo1: str, tipo2: str, ril: str)-> pd.DataFrame:
     l = []
     s = ""
