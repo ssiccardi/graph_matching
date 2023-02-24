@@ -193,7 +193,8 @@ def getIdenName(ideng, g, conn : Connection):
 
 
 def canProceed(ideng, conn: Connection):
-    # PARTI DA PRESUPPOSTO entita' abbiano un codice identificativo e che quindi in input ci sia solo un ideng
+    # PARTI DA PRESUPPOSTO entita' abbiano un codice identificativo 
+    # e che quindi in input ci sia solo un ideng
     res = conn.query("MATCH (e) WHERE e.id = " + str(ideng) + " RETURN COUNT(e) as ents")
     
     if res is None:
@@ -216,6 +217,12 @@ def retrieveInfos(toExaminG1, toExaminG2, attrG1, attrG2):
 
 
 def removeAttr(attr, rem):
+    """Rimuove attributi contenuti in rem da attr
+
+    Args:
+        attr (_type_): attributi
+        rem (_type_): attributi da rimuovere
+    """    
     for r in rem:
         attr.pop(r)
 
@@ -253,8 +260,21 @@ def deleteSemi(lista, conn: Connection):
     return l
 
 
-# Dato id di entita', grafo e direzione delle relazioni (partenti/entranti) ritorna la lista delle relazioni semifisse ad essa collegate
-def getSemi(id, grafo, direzione, conn: Connection):
+def getSemi(id: int, grafo: int, direzione: int, conn: Connection) -> list :
+    """Dati i parametri restituisce la lista delle relazioni di tipo SemiFisso ad essa collegate
+
+    Args:
+        id (int): identifica l'istanza
+        grafo (int): indica il grafo a cui ppartiene l'istanza identificata tramite id
+        direzione (int): se 0 implica entità sorgente, se 1 implica entità destinazione
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Raises:
+        Exception: in caso la query non vada a buon fine
+
+    Returns:
+        list: lista di relazioni SemiFisse associate all'istanza specificata in input
+    """    
     l = list()
     q = "MATCH "
     if direzione == 0:
@@ -287,11 +307,21 @@ def getSemi(id, grafo, direzione, conn: Connection):
     return onlySemi(l, conn)
 
 
-# @param(id) id_ent
-# @param(grafo) numero che indica in quale grafo prendere le relazioni
-# @param(direzione) numero che indica la direzione, 0 --> / 1 <--
-# return --> lista di relazioni direzionate da o per id nel grafo specificato
-def getRel(id, grafo, direzione: int, conn: Connection):
+def getRel(id, grafo, direzione: int, conn: Connection)-> list:
+    """Restituisce la lista delle relazioni (non SemiFisse) associate ad un istanza di Entità specificata
+
+    Args:
+        id (int or str): identificatore dell'istanza dato dal sistema
+        grafo (int or str): grafo di  appartenenenza dell'istanza
+        direzione (int): 0 se l'entità è sorgente, 1 se è destinazione
+        conn (Connection): oggett dedicato alla connessione a Neo4j
+
+    Raises:
+        Exception: se la query non va a buon fine
+
+    Returns:
+        list: lista di relazioni (non SemiFisse) 
+    """    
     l = list()
     q = "MATCH "
     if direzione == 0:
@@ -334,6 +364,21 @@ def getDir(d: int):
 # @param(r1, r2) id delle relazioni
 # return --> true se la relazione e' dello stesso tipo, nome e direzione, false altrimenti
 def sameRel(r1, r2, id, direzione: int, conn: Connection):
+    """Stabilisce se due relazioni sono uguali
+
+    Args:
+        r1 (int or str): id di Neo4j per relazione
+        r2 (int or str): id di Neo4j per relazione
+        id (int or str): id dato dal sistema per l'istanza di Entità
+        direzione (int): 0 se l'entità è sorgente, 1 se è destinazione
+        conn (Connection): oggetto dedicato alla connessione con Neo4j
+
+    Raises:
+        Exception: se la query non va a buon fine
+
+    Returns:
+        bool: True se le relazioni sono dello stesso tipo, nome e direzione, False altrimenti
+    """    
     q = (
         "MATCH "
         + getDir(direzione)
@@ -384,6 +429,16 @@ def createTypeBucket(relL1, relL2):
         d[r.get("tipo")] = 0
     return d
 
+def createDF_Entity(cfr: str, typeEnt1: str = " ", typeEnt2: str = " ", id1: int = -1, id2: int = -1, typeAttr1: str = " ", 
+                    typeAttr2: str = " ", valueAttr1: str = " ", valueAttr2: str = " ")-> pd.DataFrame :
+    return pd.DataFrame({
+            "Descrizione confronto attributo" : [cfr],
+            "Tipo Entità Grafo1" :  [typeEnt1], "ID Entità Grafo1" : [id1], 
+            "Tipo attributo Entità Grafo1" : [typeAttr1], "Attributo Entità Grafo1" : [valueAttr1],
+            "Tipo Entità Grafo2" : [typeEnt2], "ID Entità Grafo2" : [id2], 
+            "Tipo attributo Entità Grafo2" : [typeAttr2], "Attributo Entità Grafo2" : [valueAttr2]
+    })
+    
 def createDF(src: dict, dst: dict, rel1: int, rel2: int, tipo1: str, tipo2: str, ril: str)-> pd.DataFrame:
     l = []
     s = ""
