@@ -28,7 +28,7 @@ def create_instance_mine(conn: Connection, t, attributes, graph, id):
                     + " {"
                     + stringify_attributes(legal_attrs)
                     + ", graph: "
-                    + str(graph)
+                    + str(graph)    
                     + ", id: "
                     + str(id)
                     + "}) RETURN p.id AS node_id"
