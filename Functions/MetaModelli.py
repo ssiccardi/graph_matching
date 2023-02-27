@@ -87,6 +87,25 @@ def metamodelloIndirizzo(conn: Connection):
             tx.commit()
             tx.close()
 
+def metamodelloAutomobile(conn: Connection):
+    with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
+        with session.begin_transaction() as tx:
+
+            checkPresence = tx.run(
+                "MATCH (instance:Automobile) - [r:HAS] -> (a:Targa) RETURN instance,r,a"
+            )
+            checkPresenceValues = checkPresence.values()
+
+            if len(checkPresenceValues) == 0:
+                tx.run(
+                    "CREATE (instance:Automobile {label: 'Automobile', type: 'entity'}) - [:HAS] -> (a:Targa {label: 'Targa', type: 'attr'}), (instance) - [:IDENTIFIED] -> (iden:Identifier {label: 'iden'}), (iden) - [:IDENTIFIED_BY] -> (a) RETURN id(instance) AS node_id"
+                )
+            else:
+                print("Metamodello entità tipo Automobile già presente")
+
+            tx.commit()
+            tx.close()
+
 def addType(conn: Connection, t: str):
     with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
         with session.begin_transaction() as tx:
@@ -97,13 +116,13 @@ def addType(conn: Connection, t: str):
 
             if flag == "y":
                 alreadyPresent = tx.run(
-                    "MATCH (instance:" + str(t) + " {type: 'entity'}) RETURN instance"
+                    "MATCH (instance:" + str(t) + " {type: 'entity'}) RETURN instance" # type: ignore 
                 )
                 alreadyPresentValues = alreadyPresent.values()
 
                 if len(alreadyPresentValues) == 0:
                     newType = tx.run(
-                        "CREATE (instance:"
+                        "CREATE (instance:" #type: ignore
                         + str(t)
                         + " {label: '"
                         + str(t)
@@ -135,13 +154,13 @@ def addAttribute(conn: Connection, t: str, attribute: str):
 
             if flag == "y":
                 typePresence = tx.run(
-                    "MATCH (instance:" + str(t) + " {type: 'entity'}) RETURN instance"
+                    "MATCH (instance:" + str(t) + " {type: 'entity'}) RETURN instance" #type: ignore
                 )
                 typeValues = typePresence.values()
 
                 if len(typeValues) == 1:
                     attrAlreadyPresent = tx.run(
-                        "MATCH (instance:"
+                        "MATCH (instance:" #type: ignore
                         + str(t)
                         + " {type: 'entity'}) - [rel:HAS] -> (attr:"
                         + str(attribute)
@@ -151,7 +170,7 @@ def addAttribute(conn: Connection, t: str, attribute: str):
 
                     if len(attrPresentValues) == 0:
                         tx.run(
-                            "MATCH (type:"
+                            "MATCH (type:" #type: ignore
                             + str(t)
                             + " {type: 'entity'}) CREATE (type) - [rel:HAS] -> (attr:"
                             + str(attribute)
@@ -196,7 +215,7 @@ def addIdentifier(conn: Connection, t: str, attribute: str):
 
             if flag == "y":
                 typePresence = tx.run(
-                    "MATCH (instance:" + t + " {type: 'entity'}) RETURN instance"
+                    "MATCH (instance:" + t + " {type: 'entity'}) RETURN instance" #type: ignore
                 )
                 typeValues = typePresence.values()
 
@@ -211,7 +230,7 @@ def addIdentifier(conn: Connection, t: str, attribute: str):
 
                     if len(legal_attrs) > 0:
                         nodeToIden = tx.run(
-                            "MATCH (instance:"
+                            "MATCH (instance:" #type: ignore
                             + t
                             + " {type: 'entity'}) CREATE (instance) - [rel:IDENTIFIED] -> (iden:Identifier {label: 'iden'}) RETURN id(iden) AS iden_id"
                         )
@@ -251,7 +270,7 @@ def relazione(conn: Connection, nome: str, riflessiva: int, card):
     """
     with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
         with session.begin_transaction() as tx:
-            checkPresence = tx.run('Match (e) WHERE e.label = "' + nome + '" RETURN e')
+            checkPresence = tx.run('Match (e) WHERE e.label = "' + nome + '" RETURN e') #type: ignore
             checkPresenceValues = checkPresence.values()
 
             if len(checkPresenceValues) == 0:
@@ -264,7 +283,7 @@ def relazione(conn: Connection, nome: str, riflessiva: int, card):
                     + str(riflessiva)
                     + "', type:'attr'}) RETURN id(instance) AS node_id"
                 )
-                tx.run(query)
+                tx.run(query) #type: ignore
             else:
                 print("Metamodello relazione con nome [{}] già esistente!".format(nome))
 

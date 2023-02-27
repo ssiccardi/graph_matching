@@ -97,7 +97,7 @@ def getAttr(ideng, g, conn: Connection):
         + whichGraph(g)
         + "p.id = "
         + str(ideng)
-        + " return properties(p)"
+        + " return properties(p), id(p), labels(p) as tipo"
     )
 
     result = conn.query(q) 
@@ -107,9 +107,10 @@ def getAttr(ideng, g, conn: Connection):
 
     if len(result) < 1:  
         return d
-
-    result = result.pop()  
-    result = result.get("properties(p)")
+    
+    d["tipo"] = result.__getitem__(0).get("tipo")[0]
+    d["idDB"] = result.__getitem__(0).get("id(p)")
+    result = result.__getitem__(0).get("properties(p)")
     for e in result:  # itera sulle KEYS e poi estrapola dal nodo tramite key
         if e != "graph" and e != "id":
             d[e] = result.get(e)
@@ -429,13 +430,13 @@ def createTypeBucket(relL1, relL2):
         d[r.get("tipo")] = 0
     return d
 
-def createDF_Entity(cfr: str, typeEnt1: str = " ", typeEnt2: str = " ", id1: int = -1, id2: int = -1, typeAttr1: str = " ", 
+def createDF_Entity(cfr: str, typeEnt: str = " ", id1: int = -1, id2: int = -1, typeAttr1: str = " ", 
                     typeAttr2: str = " ", valueAttr1: str = " ", valueAttr2: str = " ")-> pd.DataFrame :
     return pd.DataFrame({
             "Descrizione confronto attributo" : [cfr],
-            "Tipo Entità Grafo1" :  [typeEnt1], "ID Entità Grafo1" : [id1], 
+            "Tipo Entità" :  [typeEnt], "ID Entità Grafo1" : [id1], 
             "Tipo attributo Entità Grafo1" : [typeAttr1], "Attributo Entità Grafo1" : [valueAttr1],
-            "Tipo Entità Grafo2" : [typeEnt2], "ID Entità Grafo2" : [id2], 
+            "ID Entità Grafo2" : [id2], 
             "Tipo attributo Entità Grafo2" : [typeAttr2], "Attributo Entità Grafo2" : [valueAttr2]
     })
     

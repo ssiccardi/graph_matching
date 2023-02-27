@@ -11,6 +11,17 @@ md.metamodelloPersona(conn)
 md.metamodelloSocieta(conn)
 md.metamodelloLuogo(conn)
 md.metamodelloIndirizzo(conn)
+md.metamodelloAutomobile(conn)
+
+#Attrinbuti extra per MetaModello Automobile:
+md.addAttribute(conn, 'Automobile', 'Marca') 
+md.addAttribute(conn, 'Automobile', 'NomeModello') 
+md.addAttribute(conn, 'Automobile', 'Colore') 
+md.addAttribute(conn, 'Automobile', 'Porte') 
+md.addAttribute(conn, 'Automobile', 'Cilindrata') 
+md.addAttribute(conn, 'Automobile', 'LitriSerbatoio')
+md.addAttribute(conn, 'Automobile', 'AriaCondizionata') 
+md.addAttribute(conn, 'Automobile', 'Pneumatici')  
 
 #Attributi extra per MetaModelli di entita':
 md.addAttribute(conn, 'Person', 'Sesso') #aggiunta sesso a persone
