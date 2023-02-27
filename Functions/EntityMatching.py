@@ -27,8 +27,8 @@ def entityMatching(ideng: int, conn: Connection)-> str:
     toExaminG1, toExaminG2 = getIdenName(ideng, "G1", conn), getIdenName(ideng, "G2", conn)  
     # già ordinati per chiave alfabeticamente
         
-        id1, id2 = attrG1.pop("idDB"), attrG2.pop("idDB")
-        tipo1 =  attrG1.pop("tipo"); attrG2.pop("tipo")
+    id1, id2 = attrG1.pop("idDB"), attrG2.pop("idDB")
+    tipo1 =  attrG1.pop("tipo"); attrG2.pop("tipo")
     
     # DataFrame per i risultati
     df = pd.DataFrame(columns=[
