@@ -1,6 +1,225 @@
 ## Directory Functions 
 
- ### File Connection.py 
+ ### File AlgorithmUtilities.py 
+
+ 
+
+ ### Function Header --> 
+
+`getLimit(t: str, conn: Connection) -> int:
+    ` 
+
+ - Ottiene la Cardinalita per una relazione semifissa
+- Args:
+  - t (str): nome della relazione
+  - conn (Connectio): oggetto dedicato alla connessione a Neo4j
+- Returns:
+  - int: Cardinalita relazione se presente, ?unknown? altrimenti
+
+
+ ### Function Header --> 
+
+`isSemiFissa(t: str, conn: Connection) -> bool:
+    ` 
+
+ - Capisce se la relazione e' di tipo SemiFisso
+- Args:
+  - t (str): nome della relazione
+  - conn (Connection): oggetto dedicato alla connessione a Neo4j
+- Returns:
+  - bool: True se SemiFissa, False altrimenti
+
+
+ ### Function Header --> 
+
+`getAttrId(id, conn: Connection) -> dict:
+    ` 
+
+ - Ritorna una lista di chiavi valori con gli attributi
+- Args:
+  - id (int): id dell'entità dato da AuraDB
+  - conn (Connection): oggetto dedicato alla connessione a Neo4j
+- Raises:
+  - Exception: segnala errore nella query
+- Returns:
+  - dict: attributi chiave-valore
+
+
+ ### Function Header --> 
+
+`getAttr(ideng, g, conn: Connection):  
+    ` 
+
+ - Ritorna una lista di chiavi valori con gli attributi
+- Args:
+  - ideng (int): id dell'entita'
+  - g (str): grafo da cui prendere gli attributi
+  - conn (Connection): oggetto dedicato alla connessione a Neo4j
+- Returns:
+  - dict: attributi chiave-valore
+
+
+ ### Function Header --> 
+
+`getIdenNameId(id, conn: Connection) -> list:
+    ` 
+
+ - Ritorna una lista di attributi identitari
+- Args:
+  - id (int): id dell'entita' dato da AuraDB
+  - conn (Connection): oggetto dedicato alla connessione a Neo4j
+- Returns:
+  - list: attributi identitari
+
+
+ ### Function Header --> 
+
+`getIdenName(ideng, g, conn : Connection):
+    ` 
+
+ - Ritorna una lista di attributi identitari
+- Args:
+  - ideng (int): id dell'entita'
+  - g (str): grafo da cui prendere gli attributi
+  - conn (Connection): oggetto dedicato alla connessione a Neo4j
+- Returns:
+  - list: attributi identitari
+
+
+ ### Function Header --> 
+
+`canProceed(ideng, conn: Connection):
+    ` 
+
+ - Controlla se le istanze delle Entità identificate dall'id esistono
+- Args:
+  - ideng (int or str): id dato dal sistema alle entità nei due grafi diversi
+  - conn (Connection): oggetto dedicato alla connessione a Neo4j
+- Raises:
+  - Exception: _description_
+- Returns:
+  - _type_: _description_
+
+
+ ### Function Header --> 
+
+`removeAttr(attr, rem):
+    ` 
+
+ - Rimuove attributi contenuti in rem da attr
+- Args:
+  - attr (_type_): attributi
+  - rem (_type_): attributi da rimuovere
+
+
+ ### Function Header --> 
+
+`onlySemi(lista, conn: Connection):
+    ` 
+
+ - Filtra le relazioni non SemiFisse
+- Args:
+  - lista (list): lista di relazioni
+  - conn (Connection): oggetto dedicato alla connessione a Neo4j
+- Returns:
+  - list: lista di relazioni SemiFisse
+
+
+ ### Function Header --> 
+
+`deleteSemi(lista, conn: Connection):
+    ` 
+
+ - Filtra le relazioni SemiFisse
+- Args:
+  - lista (list): lista di relazioni
+  - conn (Connection): oggetto dedicato alla connessione a Neo4j
+- Returns:
+  - list: lista di relazioni SemiFisse
+
+
+ ### Function Header --> 
+
+`getSemi(id: int, grafo: int, direzione: int, conn: Connection) -> list :
+    ` 
+
+ - Dati i parametri restituisce la lista delle relazioni di tipo SemiFisso ad essa collegate
+- Args:
+  - id (int): identifica l'istanza
+  - grafo (int): indica il grafo a cui ppartiene l'istanza identificata tramite id
+  - direzione (int): se 0 implica entità sorgente, se 1 implica entità destinazione
+  - conn (Connection): oggetto dedicato alla connessione a Neo4j
+- Raises:
+  - Exception: in caso la query non vada a buon fine
+- Returns:
+  - list: lista di relazioni SemiFisse associate all'istanza specificata in input
+
+
+ ### Function Header --> 
+
+`getRel(id, grafo, direzione: int, conn: Connection)-> list:
+    ` 
+
+ - Restituisce la lista delle relazioni (non SemiFisse) associate ad un istanza di Entità specificata
+- Args:
+  - id (int or str): identificatore dell'istanza dato dal sistema
+  - grafo (int or str): grafo di  appartenenenza dell'istanza
+  - direzione (int): 0 se l'entità è sorgente, 1 se è destinazione
+  - conn (Connection): oggett dedicato alla connessione a Neo4j
+- Raises:
+  - Exception: se la query non va a buon fine
+- Returns:
+  - list: lista di relazioni (non SemiFisse)
+
+
+ ### Function Header --> 
+
+`sameRel(r1, r2, id, direzione: int, conn: Connection):
+    ` 
+
+ - Stabilisce se due relazioni sono uguali
+- Args:
+  - r1 (int or str): id di Neo4j per relazione
+  - r2 (int or str): id di Neo4j per relazione
+  - id (int or str): id dato dal sistema per l'istanza di Entit�
+  - direzione (int): 0 se l'entità è sorgente, 1 se è destinazione
+  - conn (Connection): oggetto dedicato alla connessione con Neo4j
+- Raises:
+  - Exception: se la query non va a buon fine
+- Returns:
+  - bool: True se le relazioni sono dello stesso tipo, nome e direzione, False altrimenti
+
+
+ ### Function Header --> 
+
+`overLimit(tipo: str, val: int, conn: Connection)-> list:
+    ` 
+
+ - Ritorna una lista di stringhe che descrivono lo stato delle relazioni SemiFisse considerate
+- Args:
+  - tipo (str): tipo della relazione
+  - val (int): Valore limite associato a tipo
+  - conn (Connection): oggetto dedicato alla connessione con Neo4j
+- Returns:
+  - list: stringhe che descrivono lo stato delle relazioni considerate
+
+
+ ### Function Header --> 
+
+`createTypeBucket(relL1: list, relL2: list)-> dict[str, int]:
+    ` 
+
+ - Crea un dizionario di tipi presenti nelle due liste
+- Args:
+  - relL1 (list): lista di relazioni come stringhe
+  - relL2 (list): lista di relazioni come stringh
+- Returns:
+  - dict[str, int]: dizionario con relazioni come chiavi e 0 come valore
+ 
+
+ <hr> 
+
+### File Connection.py 
 
  
 
@@ -21,7 +240,56 @@
 
 ### File DbUtilities.py 
 
+  
+
+ <hr> 
+
+### File Entity.py 
+
  
+
+ ### Function Header --> 
+
+`create_instance_mine(conn: Connection, t, attributes, graph, id):
+    ` 
+
+ - Crea un'entita' con attributi dati, nel grafo dato e di tipologia data. Inoltre permette di specificare un id extra
+- Args:
+  - conn (Connection): oggetto dedicato alla connessione a Neo4j
+  - t (str): tipo dell'entita'
+  - attributes (dict): key-value attributes
+  - graph (str): descrive il grafo
+  - id (int): identificatore aggiuntivo
+- Returns:
+  - void:
+
+
+ ### Function Header --> 
+
+`delete_instance(conn: Connection, t: str, attributes: dict):
+    ` 
+
+ - Elimina un'entita' con attributi dati e di tipologia data. IN ENTRAMBI I GRAFI
+- Args:
+  - conn (Connection): oggetto dedicato alla connessione a Neo4j
+  - t (str): tipo dell'entita'
+  - attributes (dict): key-value attributes
+- Returns:
+  - void:
+
+
+ ### Function Header --> 
+
+`delete_instance_id(conn: Connection, id: int):
+    ` 
+
+ - Elimina un'entita' con attributi dati e di tipologia data. IN ENTRAMBI I GRAFI
+- Args:
+  - conn (Connection): oggetto dedicato alla connessione a Neo4j
+  - id (int): ID univoco dell'entita'
+- Returns:
+  - void:
+
 
  ### Function Header --> 
 
@@ -42,16 +310,66 @@
 
  <hr> 
 
+### File EntityMatching.py 
+
+ 
+
+ ### Function Header --> 
+
+`entityMatching(ideng: int, conn: Connection)-> str:
+    ` 
+
+ - Analizza due entita' e i loro attributi in due sottografi differenti
+- Args:
+  - ideng (int): id dell'entita', deve esistere
+  - conn (Connection): oggetto dedicato alla connessione a Neo4j
+- Returns:
+  - str: esito dell'analisi
+ 
+
+ <hr> 
+
+### File MetaModelli.py 
+
+ 
+
+ ### Function Header --> 
+
+`relazione(conn: Connection, nome: str, riflessiva: int, card):
+    ` 
+
+ - Definisce un metamodello per una relazione
+- Args:
+  - conn (Connection): oggetto dedicato alla connessione a Neo4j
+  - nome (str): nome della relazione
+  - riflessiva (int): per capire se la relazione e' bidirezionale
+  - card (int or str): identifica il numero massimo con cui la relazione puo' essere utilizzata su una singola entita'
+
+
+ ### Function Header --> 
+
+`addRelAttribute(conn: Connection, t: str, attribute: str):
+    ` 
+
+ - Aggiunge un'attributo al metamodello di una relazione
+- Args:
+  - conn (Connection): oggetto dedicato alla connessione a Neo4j
+  - t (str): tipo della relazione
+  - attribute (str): nome dell'attributo da aggiungere
+ 
+
+ <hr> 
+
 ### File Relation.py 
 
  
 
  ### Function Header --> 
 
-`sameSource(r1, r2, conn: Connection)-> bool:
+`sameTargetIden(r1, r2, conn: Connection) -> bool:
     ` 
 
- - Stabilisce sue due relazioni hanno la stessa entita' sorgente sulla base degli id extra
+ - Stabilisce sue due relazioni hanno la stessa entita' target sulla base degli id extra
 - Args:
   - r1 (int or str): id relazione
   - r2 (int or str): id relazione_
@@ -64,10 +382,10 @@
 
  ### Function Header --> 
 
-`sameTarget(r1, r2, conn: Connection) -> bool:
+`sameSourceIden(r1, r2, conn: Connection) -> bool:
     ` 
 
- - Stabilisce sue due relazioni hanno la stessa entita' target sulla base degli id extra
+ - Stabilisce sue due relazioni hanno la stessa entita' sorgente sulla base degli id extra
 - Args:
   - r1 (int or str): id relazione
   - r2 (int or str): id relazione_
@@ -93,7 +411,7 @@
 
  ### Function Header --> 
 
-`isMultipla(t: str, conn: Connection) -> bool:
+`_isMultipla(t: str, conn: Connection) -> bool:
     ` 
 
  - Capisce se la relazione e' di tipo Multiplo
@@ -130,18 +448,6 @@
   - conn (Connection): oggetto dedicato alla connessione a Neo4j
 - Returns:
   - bool: True se passa tutti i controlli, False altrimenti
-
-
- ### Function Header --> 
-
-`addRelAttribute(conn: Connection, t: str, attribute: str):
-    ` 
-
- - Aggiunge un'attributo al metamodello di una relazione
-- Args:
-  - conn (Connection): oggetto dedicato alla connessione a Neo4j
-  - t (str): tipo della relazione
-  - attribute (str): nome dell'attributo da aggiungere
 
 
  ### Function Header --> 
@@ -287,179 +593,6 @@
   - Exception: Se la relazione non ha scadenza
 - Returns:
   - bool: True se scaduta, False altrimenti
- 
-
- <hr> 
-
-### File EntityMatching.py 
-
- 
-
- ### Function Header --> 
-
-`entityMatching(ideng: int, conn: Connection):
-    ` 
-
- - Analizza due entita' e i loro attributi in due sottografi differenti
-- Args:
-  - ideng (int): id dell'entita', deve esistere
-  - conn (Connection): oggetto dedicato alla connessione a Neo4j
-- Returns:
-  - str: esito dell'analisi
- 
-
- <hr> 
-
-### File MetaModelli.py 
-
- 
-
- ### Function Header --> 
-
-`relazione(conn: Connection, nome: str, riflessiva: int, card):
-    ` 
-
- - Definisce un metamodello per una relazione
-- Args:
-  - conn (Connection): oggetto dedicato alla connessione a Neo4j
-  - nome (str): nome della relazione
-  - riflessiva (int): per capire se la relazione e' bidirezionale
-  - card (int or str): identifica il numero massimo con cui la relazione puo' essere utilizzata su una singola entita'
- 
-
- <hr> 
-
-### File Entity.py 
-
- 
-
- ### Function Header --> 
-
-`create_instance_mine(conn: Connection, t, attributes, graph, id):
-    ` 
-
- - Crea un'entita' con attributi dati, nel grafo dato e di tipologia data. Inoltre permette di specificare un id extra
-- Args:
-  - conn (Connection): oggetto dedicato alla connessione a Neo4j
-  - t (str): tipo dell'entita'
-  - attributes (dict): key-value attributes
-  - graph (str): descrive il grafo
-  - id (int): identificatore aggiuntivo
-- Returns:
-  - void:
-
-
- ### Function Header --> 
-
-`delete_instance(conn: Connection, t: str, attributes: dict):
-    ` 
-
- - Elimina un'entita' con attributi dati e di tipologia data. IN ENTRAMBI I GRAFI
-- Args:
-  - conn (Connection): oggetto dedicato alla connessione a Neo4j
-  - t (str): tipo dell'entita'
-  - attributes (dict): key-value attributes
-- Returns:
-  - void:
-
-
- ### Function Header --> 
-
-`delete_instance_id(conn: Connection, id: int):
-    ` 
-
- - Elimina un'entita' con attributi dati e di tipologia data. IN ENTRAMBI I GRAFI
-- Args:
-  - conn (Connection): oggetto dedicato alla connessione a Neo4j
-  - id (int): ID univoco dell'entita'
-- Returns:
-  - void:
- 
-
- <hr> 
-
-### File AlgorithmUtilities.py 
-
- 
-
- ### Function Header --> 
-
-`getLimit(t: str, conn: Connection) -> int:
-    ` 
-
- - Ottiene la Cardinalita per una relazione semifissa
-- Args:
-  - t (str): nome della relazione
-  - conn (Connectio): oggetto dedicato alla connessione a Neo4j
-- Returns:
-  - int: Cardinalita relazione se presente, ?unknown? altrimenti
-
-
- ### Function Header --> 
-
-`isSemiFissa(t: str, conn: Connection) -> bool:
-    ` 
-
- - Capisce se la relazione e' di tipo SemiFisso
-- Args:
-  - t (str): nome della relazione
-  - conn (Connection): oggetto dedicato alla connessione a Neo4j
-- Returns:
-  - bool: True se SemiFissa, False altrimenti
-
-
- ### Function Header --> 
-
-`getAttr(ideng, g, conn: Connection):  
-    ` 
-
- - Ritorna una lista di chiavi valori con gli attributi
-- Args:
-  - ideng (int): id dell'entita'
-  - g (str): grafo da cui prendere gli attributi
-  - conn (Connection): oggetto dedicato alla connessione a Neo4j
-- Returns:
-  - dict: key-value attributes
-
-
- ### Function Header --> 
-
-`getIdenName(ideng, g, conn : Connection):
-    ` 
-
- - Ritorna una lista di attributi identitari
-- Args:
-  - ideng (int): id dell'entita'
-  - g (str): grafo da cui prendere gli attributi
-  - conn (Connection): oggetto dedicato alla connessione a Neo4j
-- Returns:
-  - list: attributi identitari
-
-
- ### Function Header --> 
-
-`onlySemi(lista, conn: Connection):
-    ` 
-
- - Filtra le relazioni non SemiFisse
-- Args:
-  - lista (list): lista di relazioni
-  - conn (Connection): oggetto dedicato alla connessione a Neo4j
-- Returns:
-  - list: lista di relazioni SemiFisse
-
-
- ### Function Header --> 
-
-`deleteSemi(lista, conn: Connection):
-    ` 
-
- - Filtra le relazioni SemiFisse
-- Args:
-  - lista (list): lista di relazioni
-  - conn (Connection): oggetto dedicato alla connessione a Neo4j
-- Returns:
-  - list: lista di relazioni SemiFisse
  
 
  <hr> 

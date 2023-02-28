@@ -53,7 +53,18 @@ def isSemiFissa(t: str, conn: Connection) -> bool:
     return res.pop()[0]  
 
 def getAttrId(id, conn: Connection) -> dict:
-    #TODO
+    """Ritorna una lista di chiavi valori con gli attributi
+
+    Args:
+        id (int): id dell'entità dato da AuraDB
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Raises:
+        Exception: segnala errore nella query
+
+    Returns:
+        dict: attributi chiave-valore
+    """    
     d = {}
     q = (
         "match (p) where "
@@ -88,7 +99,7 @@ def getAttr(ideng, g, conn: Connection):
         conn (Connection): oggetto dedicato alla connessione a Neo4j
 
     Returns:
-        dict: key-value attributes
+        dict: attributi chiave-valore
     """    
     d = {}
     q = (
@@ -455,7 +466,7 @@ def createTypeBucket(relL1: list, relL2: list)-> dict[str, int]:
         d[r.get("tipo")] = 0
     return d
 
-def createDF_Entity(cfr: str, typeEnt: str = " ", id1: int = -1, id2: int = -1, typeAttr1: str = " ", 
+def updateDF_Entity(cfr: str, typeEnt: str = " ", id1: int = -1, id2: int = -1, typeAttr1: str = " ", 
                     typeAttr2: str = " ", valueAttr1: str = " ", valueAttr2: str = " ")-> pd.DataFrame :
     return pd.DataFrame({
             "Descrizione confronto attributo" : [cfr],
@@ -465,7 +476,7 @@ def createDF_Entity(cfr: str, typeEnt: str = " ", id1: int = -1, id2: int = -1, 
             "Tipo attributo Entità Grafo2" : [typeAttr2], "Attributo Entità Grafo2" : [valueAttr2]
     })
     
-def createDF(src: dict, dst: dict, rel1: int, rel2: int, tipo1: str, tipo2: str, ril: str)-> pd.DataFrame:
+def updateDF(src: dict, dst: dict, rel1: int, rel2: int, tipo1: str, tipo2: str, ril: str)-> pd.DataFrame:
     l = []
     s = ""
     if src is not None:

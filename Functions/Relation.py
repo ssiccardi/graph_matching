@@ -5,6 +5,19 @@ from datetime import date
 import neo4j
 
 def sameTargetIden(r1, r2, conn: Connection) -> bool:
+    """Stabilisce sue due relazioni hanno la stessa entita' target sulla base degli id extra
+
+    Args:
+        r1 (int or str): id relazione
+        r2 (int or str): id relazione_
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Raises:
+        Exception: Se la query non va a buon fine 
+
+    Returns:
+        bool: True se hanno gli stessi ID extra, False altrimenti
+    """    
     q = ("MATCH () -[r]-> (e) WHERE id(r) = " + str(r1) + " WITH id(e) as id1 MATCH () -[r]-> (e) WHERE id(r) = " + str(r2) + " RETURN id1, id(e) as id2")
     res = conn.query(q)
     if res is None:
@@ -19,20 +32,6 @@ def sameTargetIden(r1, r2, conn: Connection) -> bool:
     return False
 
 def sameSourceIden(r1, r2, conn: Connection) -> bool:
-    q = ("MATCH (e) -[r]-> () WHERE id(r) = " + str(r1) + " WITH id(e) as id1 MATCH (e) -[r]-> () WHERE id(r) = " + str(r2) + " RETURN id1, id(e) as id2")
-    res = conn.query(q)
-    if res is None:
-        raise Exception("Errore con query" + q)
-    iden1, iden2 = getIdenNameId(res[0][0], conn), getIdenNameId(res[0][1], conn)
-    if iden1 == iden2:
-        attr1, attr2 = getAttrId(res[0][0], conn), getAttrId(res[0][1], conn)
-        for i in iden1:
-            if attr1.get(i) != attr2.get(i):
-                return False
-        return True
-    return False;
-
-def sameSource(r1, r2, conn: Connection)-> bool:
     """Stabilisce sue due relazioni hanno la stessa entita' sorgente sulla base degli id extra
 
     Args:
@@ -46,49 +45,18 @@ def sameSource(r1, r2, conn: Connection)-> bool:
     Returns:
         bool: True se hanno gli stessi ID extra, False altrimenti
     """    
-    q = (
-        "match (e) -[r]-> () where id(r) = "
-        + str(r1)
-        + " with e.id as id1 match (e) -[r]-> () where id(r) = "
-        + str(r2)
-        + " return e.id = id1"
-    )
-    
+    q = ("MATCH (e) -[r]-> () WHERE id(r) = " + str(r1) + " WITH id(e) as id1 MATCH (e) -[r]-> () WHERE id(r) = " + str(r2) + " RETURN id1, id(e) as id2")
     res = conn.query(q)
-
     if res is None:
         raise Exception("Errore con query" + q)
-
-    return res.pop()[0] 
-
-def sameTarget(r1, r2, conn: Connection) -> bool:
-    """Stabilisce sue due relazioni hanno la stessa entita' target sulla base degli id extra
-
-    Args:
-        r1 (int or str): id relazione
-        r2 (int or str): id relazione_
-        conn (Connection): oggetto dedicato alla connessione a Neo4j
-
-    Raises:
-        Exception: Se la query non va a buon fine 
-
-    Returns:
-        bool: True se hanno gli stessi ID extra, False altrimenti
-    """    
-    q = (
-        "match () -[r]-> (e) where id(r) = "
-        + str(r1)
-        + " with e.id as id1 match () -[r]-> (e) where id(r) = "
-        + str(r2)
-        + " return e.id = id1"
-    )
-    
-    res = conn.query(q)
-
-    if res is None:
-        raise Exception("Errore con query" + q)
-
-    return res.pop()[0]  
+    iden1, iden2 = getIdenNameId(res[0][0], conn), getIdenNameId(res[0][1], conn)
+    if iden1 == iden2:
+        attr1, attr2 = getAttrId(res[0][0], conn), getAttrId(res[0][1], conn)
+        for i in iden1:
+            if attr1.get(i) != attr2.get(i):
+                return False
+        return True
+    return False
 
 def isFissa(t: str, conn: Connection) -> bool:
     """Capisce se la relazione e' di tipo Fisso
@@ -111,7 +79,7 @@ def isFissa(t: str, conn: Connection) -> bool:
     return res.pop()[0]
 
 
-def isMultipla(t: str, conn: Connection) -> bool:
+def _isMultipla(t: str, conn: Connection) -> bool:
     """Capisce se la relazione e' di tipo Multiplo
 
     Args:
@@ -176,7 +144,7 @@ def canCreate(idDst, relName: str, conn: Connection, scadenza = None) -> bool:
         scadenza = scadenza.split(scadenza[2:3])
         if date(int(scadenza[2]), int(scadenza[1]), int(scadenza[0])) < date.today():
             return True
-    if not isMultipla(relName, conn):
+    if not _isMultipla(relName, conn):
         q = (
             "MATCH () -[r:"
             + relName
@@ -197,74 +165,6 @@ def canCreate(idDst, relName: str, conn: Connection, scadenza = None) -> bool:
 
         return not res[0][0] 
     return True
-
-
-def addRelAttribute(conn: Connection, t: str, attribute: str):
-    """Aggiunge un'attributo al metamodello di una relazione
-
-    Args:
-        conn (Connection): oggetto dedicato alla connessione a Neo4j
-        t (str): tipo della relazione
-        attribute (str): nome dell'attributo da aggiungere
-    """
-    with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
-        with session.begin_transaction() as tx:
-
-            print(
-                "A new attribute named "
-                + attribute
-                + " will be added to relation type "
-                + t
-                + ". Continue?"
-            )
-            print("y - yes, n - no")
-            flag = input()
-
-            if flag == "y":
-                typePresence = tx.run(
-                    "MATCH (instance:Relazione {type: 'relation', label:'"
-                    + str(t)
-                    + "'}) RETURN instance" # type: ignore
-                )
-                typeValues = typePresence.values()
-
-                if len(typeValues) == 1:
-                    attrAlreadyPresent = tx.run(
-                        "MATCH (instance:Relazione {type: 'relation', label:'"
-                        + t
-                        + "'}) -[rel:HAS]-> (attr:"
-                        + attribute
-                        + " {type: 'attr'}) RETURN instance, rel, attr" # type: ignore
-                    )
-                    attrPresentValues = attrAlreadyPresent.values()
-
-                    if len(attrPresentValues) == 0:
-                        attrCreate = tx.run(
-                            "MATCH (type:Relazione{type: 'relation', label:'"
-                            + t
-                            + "'}) CREATE (type) -[rel:HAS]-> (attr:"
-                            + attribute
-                            + " {label: '"
-                            + attribute
-                            + "', type: 'attr'}) RETURN type, rel, attr" # type: ignore
-                        )
-                        attrCreate.values()
-
-                        print("Attribute " + attribute + " added to entity type " + t)
-                    else:
-                        print("Attribute " + attribute + " already present.")
-
-                else:
-                    print(
-                        "Problem with relation type. Number of "
-                        + t
-                        + " type discovered: "
-                        + str(len(typeValues))
-                    )
-
-            elif flag == "n":
-                print("Operation aborted.")
-
 
 def alreadyExist(t1: str, t2: str, t: str, conn: Connection) -> bool:
     """funzione di utility per vedere se due metamodelli sono gia' collegati da una relazione di tipo t

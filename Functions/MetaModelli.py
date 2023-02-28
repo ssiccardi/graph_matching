@@ -289,3 +289,69 @@ def relazione(conn: Connection, nome: str, riflessiva: int, card):
 
             tx.commit()
             tx.close()
+
+def addRelAttribute(conn: Connection, t: str, attribute: str):
+    """Aggiunge un'attributo al metamodello di una relazione
+
+    Args:
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+        t (str): tipo della relazione
+        attribute (str): nome dell'attributo da aggiungere
+    """
+    with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
+        with session.begin_transaction() as tx:
+
+            print(
+                "A new attribute named "
+                + attribute
+                + " will be added to relation type "
+                + t
+                + ". Continue?"
+            )
+            print("y - yes, n - no")
+            flag = input()
+
+            if flag == "y":
+                typePresence = tx.run(
+                    "MATCH (instance:Relazione {type: 'relation', label:'"
+                    + str(t)
+                    + "'}) RETURN instance" # type: ignore
+                )
+                typeValues = typePresence.values()
+
+                if len(typeValues) == 1:
+                    attrAlreadyPresent = tx.run(
+                        "MATCH (instance:Relazione {type: 'relation', label:'"
+                        + t
+                        + "'}) -[rel:HAS]-> (attr:"
+                        + attribute
+                        + " {type: 'attr'}) RETURN instance, rel, attr" # type: ignore
+                    )
+                    attrPresentValues = attrAlreadyPresent.values()
+
+                    if len(attrPresentValues) == 0:
+                        attrCreate = tx.run(
+                            "MATCH (type:Relazione{type: 'relation', label:'"
+                            + t
+                            + "'}) CREATE (type) -[rel:HAS]-> (attr:"
+                            + attribute
+                            + " {label: '"
+                            + attribute
+                            + "', type: 'attr'}) RETURN type, rel, attr" # type: ignore
+                        )
+                        attrCreate.values()
+
+                        print("Attribute " + attribute + " added to entity type " + t)
+                    else:
+                        print("Attribute " + attribute + " already present.")
+
+                else:
+                    print(
+                        "Problem with relation type. Number of "
+                        + t
+                        + " type discovered: "
+                        + str(len(typeValues))
+                    )
+
+            elif flag == "n":
+                print("Operation aborted.")

@@ -6,7 +6,7 @@ from Functions.AlgorithmUtilities import (
     getIdenName,
     retrieveInfos,
     removeAttr,
-    createDF_Entity
+    updateDF_Entity
 )
 from Functions.Connection import Connection
 import pandas as pd
@@ -61,7 +61,7 @@ def entityMatching(ideng: int, conn: Connection)-> str:
                             keyG1, keyG2, attrG1.get(keyG1)
                         )
                     )
-                    df = pd.concat([df, createDF_Entity(cfr="Coincidenti", typeEnt=tipo1, id1=id1, id2=id2, typeAttr1=keyG1, typeAttr2=keyG2, valueAttr1=str(attrG1.get(keyG1)), valueAttr2=str(attrG2.get(keyG2)))], axis=0)
+                    df = pd.concat([df, updateDF_Entity(cfr="Coincidenti", typeEnt=tipo1, id1=id1, id2=id2, typeAttr1=keyG1, typeAttr2=keyG2, valueAttr1=str(attrG1.get(keyG1)), valueAttr2=str(attrG2.get(keyG2)))], axis=0)
                         
                 else:
                     print(
@@ -69,7 +69,7 @@ def entityMatching(ideng: int, conn: Connection)-> str:
                             keyG1, keyG2, attrG1.get(keyG1), attrG2.get(keyG2)
                         )
                     )
-                    df = pd.concat([df, createDF_Entity(cfr="Contraddittorie", typeEnt=tipo1, id1=id1, id2=id2, typeAttr1=keyG1, typeAttr2=keyG2, valueAttr1=str(attrG1.get(keyG1)), valueAttr2=str(attrG2.get(keyG2)))], axis=0)
+                    df = pd.concat([df, updateDF_Entity(cfr="Contraddittorie", typeEnt=tipo1, id1=id1, id2=id2, typeAttr1=keyG1, typeAttr2=keyG2, valueAttr1=str(attrG1.get(keyG1)), valueAttr2=str(attrG2.get(keyG2)))], axis=0)
                     
                 toRemoveG1.append(keyG1)
                 tmpRemove = keyG1
@@ -87,7 +87,7 @@ def entityMatching(ideng: int, conn: Connection)-> str:
                 key, attrG1.get(key)
             )
         )
-        df = pd.concat([df, createDF_Entity(cfr="Complementare", typeEnt=tipo1, id1=id1, typeAttr1=key, valueAttr1=str(attrG1.get(key)))], axis=0)
+        df = pd.concat([df, updateDF_Entity(cfr="Complementare", typeEnt=tipo1, id1=id1, typeAttr1=key, valueAttr1=str(attrG1.get(key)))], axis=0)
 
     for key in attrG2:
         print(
@@ -95,7 +95,7 @@ def entityMatching(ideng: int, conn: Connection)-> str:
                 key, attrG2.get(key)
             )
         )
-        df = pd.concat([df, createDF_Entity(cfr="Complementare", typeEnt=tipo1, id2=id2, typeAttr2=key, valueAttr2=str(attrG2.get(key)))], axis=0)
+        df = pd.concat([df, updateDF_Entity(cfr="Complementare", typeEnt=tipo1, id2=id2, typeAttr2=key, valueAttr2=str(attrG2.get(key)))], axis=0)
             
     f = open("/home/pietro/graph_matching/Contents/EntityMatchingAnalisi.csv", "w")
     f.write(df.to_csv())
