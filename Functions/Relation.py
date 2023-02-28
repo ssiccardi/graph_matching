@@ -129,7 +129,7 @@ def getScadute(idDst, relName: str, conn: Connection)-> int:
     
     return tot
 
-def canCreate(idDst, relName: str, conn: Connection, scadenza = None) -> bool:
+def _canCreate(idDst, relName: str, conn: Connection, scadenza = None) -> bool:
     """Capisce se la relazione tra le due entita' puo' essere creata. Quindi si chiede se tra le due e' gia' presente la relazione, se attiverebbe contraddizioni e cosi' via
 
     Args:
@@ -166,7 +166,7 @@ def canCreate(idDst, relName: str, conn: Connection, scadenza = None) -> bool:
         return not res[0][0] 
     return True
 
-def alreadyExist(t1: str, t2: str, t: str, conn: Connection) -> bool:
+def _alreadyExist(t1: str, t2: str, t: str, conn: Connection) -> bool:
     """funzione di utility per vedere se due metamodelli sono gia' collegati da una relazione di tipo t
 
     Args:
@@ -194,7 +194,6 @@ def alreadyExist(t1: str, t2: str, t: str, conn: Connection) -> bool:
 
     return res[0][0]  
 
-
 def addConstraint(relType1: str, relType2: str, relType: str, conn) -> bool:
     """Aggiunge un link, con nome specificato in relType, tra metamodelli (se non esiste gia')
 
@@ -207,7 +206,7 @@ def addConstraint(relType1: str, relType2: str, relType: str, conn) -> bool:
     Returns:
         bool: True se e' stato possibile aggiungerlo, False altrimenti
     """
-    if not alreadyExist(relType1, relType2, relType, conn):
+    if not _alreadyExist(relType1, relType2, relType, conn):
         q = (
             "match (t1) match (t2) where t1.label = '"
             + relType1
@@ -225,7 +224,6 @@ def addConstraint(relType1: str, relType2: str, relType: str, conn) -> bool:
 
         return res[0][0]  
     return False
-
 
 def getContraddictory(par, t: int, conn: Connection) -> list:
     """Ottiene relazioni contraddittorie
@@ -266,8 +264,7 @@ def getContraddictory(par, t: int, conn: Connection) -> list:
 
     return l
 
-
-def srcCheck(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool:
+def _srcCheck(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool:
     """Controlla se esiste rel tra le due entita'
 
     Args:
@@ -297,7 +294,7 @@ def srcCheck(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool:
     return res[0][0] 
 
 
-def alreadyLinked(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool:
+def _alreadyLinked(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool:
     """Controlla se esiste rel tra le due entita'
 
     Args:
@@ -326,7 +323,7 @@ def alreadyLinked(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool:
 
     return res[0][0] 
 
-def checkInsertion(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool:
+def _checkInsertion(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool:
     """Controlla che non avvengano inserimenti contraddittori (o non sia gia' presente)
 
     Args:
@@ -338,14 +335,14 @@ def checkInsertion(entSrc: int, entDst: int, rel: str, conn: Connection) -> bool
     Returns:
         bool: True se esiste, False altrimenti
     """
-    if alreadyLinked(entSrc, entDst, rel, conn):
+    if _alreadyLinked(entSrc, entDst, rel, conn):
         return False
 
     presentContr = getContraddictory(rel, 1, conn)
     #ottengo tutte le relazioni in contraddizioni con quella da inserire
 
     for p in presentContr:  # si controlla se nell'entita' sorgente e' presente questa relazione in contraddizione con quella da inserire
-        if alreadyLinked(entSrc, entDst, p, conn):
+        if _alreadyLinked(entSrc, entDst, p, conn):
             return False
 
     return True
@@ -379,14 +376,14 @@ def create_relation_dir(typeES: str, ES_attr: dict, gS, typeET: str, ET_attr: di
                 getEntityId(typeES, ES_attr, gS, conn),
                 getEntityId(typeET, ET_attr, gT, conn),
             )
-            if not checkInsertion(
+            if not _checkInsertion(
                 idSrc,
                 idDst,
                 relName,
                 conn
             ):
                 return "RELAZIONE in contraddizione diretta con un'altra pre esistente"
-            elif canCreate(idDst, relName, conn):
+            elif _canCreate(idDst, relName, conn):
                 q = (
                     "MATCH (eT) WHERE id(eT) = "
                     + str(idDst)
@@ -425,14 +422,14 @@ def create_relation_with_attribute(typeES: str, ES_attr: dict, gS, typeET: str, 
                 getEntityId(typeES, ES_attr, gS, conn),
                 getEntityId(typeET, ET_attr, gT, conn),
             )
-            if not checkInsertion(
+            if not _checkInsertion(
                 idSrc,
                 idDst,
                 relName,
                 conn,
             ):
                 return "RELAZIONE in contraddizione diretta con un'altra pre esistente"
-            elif canCreate(idDst, relName, conn, relAttr["scadenza"]):
+            elif _canCreate(idDst, relName, conn, relAttr["scadenza"]):
                 q = (
                     "MATCH (eT) WHERE id(eT) = "
                     + str(idDst)

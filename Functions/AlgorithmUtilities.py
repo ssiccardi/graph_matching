@@ -1,10 +1,10 @@
 from Functions.Connection import Connection
 import pandas as pd 
 
-def isNode(el):
+def _isNode(el):
     return str(type(el)) == "<class 'neo4j.graph.Node'>"
 
-def whichGraph(g):
+def _whichGraph(g):
     if g == "G1":
         return "p.graph = 1 and "
     elif g == "G2":
@@ -31,7 +31,7 @@ def getLimit(t: str, conn: Connection) -> int:
         raise Exception("Errore per relazione di tipo {}".format(t))
     return int(res.pop()[0])
 
-def isSemiFissa(t: str, conn: Connection) -> bool:
+def _isSemiFissa(t: str, conn: Connection) -> bool:
     """Capisce se la relazione e' di tipo SemiFisso
 
     Args:
@@ -104,7 +104,7 @@ def getAttr(ideng, g, conn: Connection):
     d = {}
     q = (
         "match (p) where "
-        + whichGraph(g)
+        + _whichGraph(g)
         + "p.id = "
         + str(ideng)
         + " return properties(p), id(p), labels(p) as tipo"
@@ -181,7 +181,7 @@ def getIdenName(ideng, g, conn : Connection):
     l = list()
     q = (
         "match (p) where "
-        + whichGraph(g)
+        + _whichGraph(g)
         + "p.id = "
         + str(ideng)
         + " return labels(p)"
@@ -254,7 +254,7 @@ def removeAttr(attr, rem):
     for r in rem:
         attr.pop(r)
 
-def onlySemi(lista, conn: Connection):
+def _onlySemi(lista, conn: Connection):
     """Filtra le relazioni non SemiFisse
 
     Args:
@@ -266,11 +266,11 @@ def onlySemi(lista, conn: Connection):
     """    
     l = list()
     for el in lista:
-        if isSemiFissa(el.get("tipo"), conn):
+        if _isSemiFissa(el.get("tipo"), conn):
             l.append(el)
     return l
 
-def deleteSemi(lista, conn: Connection):
+def _deleteSemi(lista, conn: Connection):
     """Filtra le relazioni SemiFisse
 
     Args:
@@ -282,7 +282,7 @@ def deleteSemi(lista, conn: Connection):
     """    
     l = list()
     for el in lista:
-        if not isSemiFissa(el.get("tipo"), conn):
+        if not _isSemiFissa(el.get("tipo"), conn):
             l.append(el)
     return l
 
@@ -330,7 +330,7 @@ def getSemi(id: int, grafo: int, direzione: int, conn: Connection) -> list :
             }
         )
 
-    return onlySemi(l, conn)
+    return _onlySemi(l, conn)
 
 def getRel(id, grafo, direzione: int, conn: Connection)-> list:
     """Restituisce la lista delle relazioni (non SemiFisse) associate ad un istanza di Entità specificata
@@ -377,9 +377,9 @@ def getRel(id, grafo, direzione: int, conn: Connection)-> list:
             }
         )
 
-    return deleteSemi(l, conn)
+    return _deleteSemi(l, conn)
 
-def getDir(d: int):
+def _getDir(d: int):
     if d == 0:
         return "(e) -[r]-> () "
     return "() -[r]-> (e) "
@@ -402,13 +402,13 @@ def sameRel(r1, r2, id, direzione: int, conn: Connection):
     """    
     q = (
         "MATCH "
-        + getDir(direzione)
+        + _getDir(direzione)
         + "where id(r) = "
         + str(r1)
         + " and e.id = "
         + str(id)
         + " with r as rr match "
-        + getDir(direzione)
+        + _getDir(direzione)
         + " where id(r) = "
         + str(r2)
         + " and e.id = "
