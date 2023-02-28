@@ -52,7 +52,6 @@ def isSemiFissa(t: str, conn: Connection) -> bool:
         raise Exception("Errore per relazione di tipo {}".format(t))
     return res.pop()[0]  
 
-
 def getAttrId(id, conn: Connection) -> dict:
     #TODO
     d = {}
@@ -117,7 +116,15 @@ def getAttr(ideng, g, conn: Connection):
     return dict(sorted(d.items()))  # ORA RITORNA UN DIZIONARIO
 
 def getIdenNameId(id, conn: Connection) -> list:
-    #TODO
+    """Ritorna una lista di attributi identitari
+
+    Args:
+        id (int): id dell'entita' dato da AuraDB
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Returns:
+        list: attributi identitari
+    """    
     l = list()
     q = (
         "match (p) where "
@@ -192,8 +199,19 @@ def getIdenName(ideng, g, conn : Connection):
     l.sort()
     return l
 
-
 def canProceed(ideng, conn: Connection):
+    """Controlla se le istanze delle Entità identificate dall'id esistono
+
+    Args:
+        ideng (int or str): id dato dal sistema alle entità nei due grafi diversi 
+        conn (Connection): oggetto dedicato alla connessione a Neo4j
+
+    Raises:
+        Exception: _description_
+
+    Returns:
+        _type_: _description_
+    """    
     # PARTI DA PRESUPPOSTO entita' abbiano un codice identificativo 
     # e che quindi in input ci sia solo un ideng
     res = conn.query("MATCH (e) WHERE e.id = " + str(ideng) + " RETURN COUNT(e) as ents")
@@ -202,7 +220,6 @@ def canProceed(ideng, conn: Connection):
         raise Exception("Errore con" + ideng)
     
     return res[0][0] == 2  
-
 
 def retrieveInfos(toExaminG1, toExaminG2, attrG1, attrG2):
     toPrint = "Entita' in G1: { "
@@ -215,7 +232,6 @@ def retrieveInfos(toExaminG1, toExaminG2, attrG1, attrG2):
     toPrint = toPrint[:-2]
     toPrint += "}"
     return toPrint
-
 
 def removeAttr(attr, rem):
     """Rimuove attributi contenuti in rem da attr
@@ -243,7 +259,6 @@ def onlySemi(lista, conn: Connection):
             l.append(el)
     return l
 
-
 def deleteSemi(lista, conn: Connection):
     """Filtra le relazioni SemiFisse
 
@@ -259,7 +274,6 @@ def deleteSemi(lista, conn: Connection):
         if not isSemiFissa(el.get("tipo"), conn):
             l.append(el)
     return l
-
 
 def getSemi(id: int, grafo: int, direzione: int, conn: Connection) -> list :
     """Dati i parametri restituisce la lista delle relazioni di tipo SemiFisso ad essa collegate
@@ -306,7 +320,6 @@ def getSemi(id: int, grafo: int, direzione: int, conn: Connection) -> list :
         )
 
     return onlySemi(l, conn)
-
 
 def getRel(id, grafo, direzione: int, conn: Connection)-> list:
     """Restituisce la lista delle relazioni (non SemiFisse) associate ad un istanza di Entità specificata
@@ -355,15 +368,11 @@ def getRel(id, grafo, direzione: int, conn: Connection)-> list:
 
     return deleteSemi(l, conn)
 
-
 def getDir(d: int):
     if d == 0:
         return "(e) -[r]-> () "
     return "() -[r]-> (e) "
 
-
-# @param(r1, r2) id delle relazioni
-# return --> true se la relazione e' dello stesso tipo, nome e direzione, false altrimenti
 def sameRel(r1, r2, id, direzione: int, conn: Connection):
     """Stabilisce se due relazioni sono uguali
 
@@ -403,9 +412,17 @@ def sameRel(r1, r2, id, direzione: int, conn: Connection):
 
     return res.pop()[0]  
 
-# crea stringhe dove segnali coincidenze o complementarità' se non sopra limite, contraddittorietà' altrimenti
-def overLimit(tipo, val, l1, l2, conn: Connection):
-    #TODO l1 e l2 servono?
+def overLimit(tipo: str, val: int, conn: Connection)-> list:
+    """Ritorna una lista di stringhe che descrivono lo stato delle relazioni SemiFisse considerate
+
+    Args:
+        tipo (str): tipo della relazione
+        val (int): Valore limite associato a tipo
+        conn (Connection): oggetto dedicato alla connessione con Neo4j
+
+    Returns:
+        list: stringhe che descrivono lo stato delle relazioni considerate
+    """    
     l = list()
     if val > getLimit(tipo, conn):
         l.append( 
@@ -420,8 +437,16 @@ def overLimit(tipo, val, l1, l2, conn: Connection):
     return l
 
 
-# crea dizionario di tipi presenti inizializzato a 0 per ogni tipo
-def createTypeBucket(relL1, relL2):
+def createTypeBucket(relL1: list, relL2: list)-> dict[str, int]:
+    """Crea un dizionario di tipi presenti nelle due liste
+
+    Args:
+        relL1 (list): lista di relazioni come stringhe
+        relL2 (list): lista di relazioni come stringh
+
+    Returns:
+        dict[str, int]: dizionario con relazioni come chiavi e 0 come valore
+    """    
     d = dict()
     for r in relL1:
         d[r.get("tipo")] = 0

@@ -71,7 +71,7 @@ def getInfoSemi(id: int, conn: Connection, df: pd.DataFrame) -> pd.DataFrame:
         df = pd.concat([df, createDF(src, None, el.get('id'), -1, el.get('tipo'), "", "Complementare Grafo2")], axis=0) # type: ignore
             
     for t in typeBucket.keys():
-        df = pd.concat([df, createDF(None, None, -1, -1, "", "", "SemiFissa" + str(overLimit(t, typeBucket.get(t), relE1, relE2, conn)))], axis=0) # type: ignore 
+        df = pd.concat([df, createDF(None, None, -1, -1, "", "", "SemiFissa" + str(overLimit(t, typeBucket.get(t), conn)))], axis=0) # type: ignore 
 
     # Parte partenti:
     b = True
