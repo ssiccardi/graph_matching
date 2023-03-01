@@ -1,15 +1,22 @@
 ,Tipo,IDRelazioneG1,TipoRelG1,IDRelazioneG2,TipoRelG2,Attr. G1,Attr. G2
-0,Complementare Grafo1,156,CUGINO_DI,-1,,Tipo : Person -- id : 11 -- Surname : Bellosi -- graph : 1 -- Name : Gioele -- ,
-0,Complementare Grafo2,164,MARITO_DI,-1,,Tipo : Person -- id : 9 -- Surname : f -- graph : 2 -- Name : f -- ,
-0,Complementare Grafo2,165,CUGINO_DI,-1,,Tipo : Person -- id : 10 -- Surname : Bellosi -- graph : 2 -- Name : Celeste -- ,
-0,Coincidente,146,PADRE_DI,158,PADRE_DI,Tipo : Person -- id : 3 -- Surname : Masolini -- graph : 1 -- Name : Fabio -- ,Tipo : Person -- id : 3 -- Surname : Masolini -- graph : 2 -- Name : Fabio -- 
-0,Contraddittoria,147,MADRE_DI,157,MADRE_DI,Tipo : Person -- id : 2 -- Surname : Scaramellini -- graph : 1 -- Name : Paola -- ,Tipo : Person -- id : 2 -- Surname : Scaramellini -- graph : 2 -- Name : Pina -- 
-0,Contraddittoria diretta,152,ZIO_DI,161,ZIA_DI,Tipo : Person -- id : 12 -- Surname : Scaramellini -- graph : 1 -- Name : Michela -- ,Tipo : Person -- id : 6 -- Surname : Scaramellini -- graph : 2 -- Name : Michela -- 
-0,Complementare Grafo2,163,MOGLIE_DI,-1,,Tipo : Person -- id : 8 -- Surname : y -- graph : 2 -- Name : y -- ,
-0,Complementare Grafo1,149,NONNA_DI,-1,,Tipo : Person -- id : 5 -- Surname : Balatti -- graph : 1 -- Name : Aneli -- ,
-0,Complementare Grafo1,150,NONNO_DI,-1,,Tipo : Person -- id : 6 -- Surname : Masolini -- graph : 1 -- Name : Lino -- ,
-0,Complementare Grafo1,151,NONNO_DI,-1,,Tipo : Person -- id : 7 -- Surname : Scaramellini -- graph : 1 -- Name : Ferruccio -- ,
-0,Complementare Grafo2,159,NONNO_DI,-1,,Tipo : Person -- id : 5 -- Surname : Balatti -- graph : 2 -- Name : Gigi -- ,
-0,Complementare Grafo2,160,NONNA_DI,-1,,Tipo : Person -- id : 4 -- Surname : Del Fante -- graph : 2 -- Name : Tina -- ,
-0,SemiFissa['Relazione di tipo NONNA_DI corretta'],-1,,-1,,,
-0,"SemiFissa['Relazione di tipo NONNO_DI contraddittoria, nei due grafi esplorati esistono ben 3 di queste relazioni']",-1,,-1,,,
+0,Coincidente,207,NIPOTE,211,NIPOTE,Tipo : Person -- id : 9 -- Surname : Masolini -- graph : 1 -- Name : Sergio -- ,Tipo : Person -- id : 9 -- Surname : Masolini -- graph : 2 -- Name : Sergio -- 
+0,Complementare Grafo2,209,CUGINO_DI,-1,,Tipo : Person -- id : 7 -- Surname : Bellosi -- graph : 2 -- Name : Gioele -- ,
+0,Complementare Grafo2,210,CUGINO_DI,-1,,Tipo : Person -- id : 8 -- Surname : Masolini -- graph : 2 -- Name : Giada -- ,
+0,Contraddittoria,189,MADRE_DI,198,MADRE_DI,Tipo : Person -- id : 2 -- Surname : Scaramellini -- graph : 1 -- Name : Paola -- ,Tipo : Person -- id : 2 -- Surname : Scaramellini -- graph : 2 -- Name : Pina -- 
+0,Coincidente,193,PADRE_DI,201,PADRE_DI,Tipo : Person -- id : 6 -- Surname : Masolini -- graph : 1 -- Name : Fabio -- ,Tipo : Person -- id : 6 -- Surname : Masolini -- graph : 2 -- Name : Fabio -- 
+0,Coincidente,194,CUGINO_DI,202,CUGINO_DI,Tipo : Person -- id : 7 -- Surname : Bellosi -- graph : 1 -- Name : Gioele -- ,Tipo : Person -- id : 7 -- Surname : Bellosi -- graph : 2 -- Name : Gioele -- 
+0,Complementare Grafo1,195,CUGINA_DI,-1,,Tipo : Person -- id : 8 -- Surname : Bellosi -- graph : 1 -- Name : Celeste -- ,
+0,Contraddittoria diretta,196,ZIA_DI,204,ZIO_DI,Tipo : Person -- id : 9 -- Surname : Masolini -- graph : 1 -- Name : Sergio -- ,Tipo : Person -- id : 9 -- Surname : Masolini -- graph : 2 -- Name : Sergio -- 
+0,Complementare Grafo1,196,ZIA_DI,-1,,Tipo : Person -- id : 9 -- Surname : Masolini -- graph : 1 -- Name : Sergio -- ,
+0,Complementare Grafo2,203,CUGINA_DI,-1,,Tipo : Person -- id : 8 -- Surname : Masolini -- graph : 2 -- Name : Giada -- ,
+0,Complementare Grafo2,205,MOGLIE_DI,-1,,Tipo : Person -- id : 10 -- Surname : Della Morte -- graph : 2 -- Name : Vanessa -- ,
+0,Complementare Grafo1,190,NONNA_DI,-1,,Tipo : Person -- id : 3 -- Surname : Balatti -- graph : 1 -- Name : Aneli -- ,
+0,Complementare Grafo1,191,NONNA_DI,-1,,Tipo : Person -- id : 4 -- Surname : Del Fante -- graph : 1 -- Name : Tina -- ,
+0,Coincidente - SemiFissa,192,NONNO_DI,200,NONNO_DI,Tipo : Person -- id : 5 -- Surname : Scaramellini -- graph : 1 -- Name : Ferruccio -- ,Tipo : Person -- id : 5 -- Surname : Scaramellini -- graph : 2 -- Name : Ferruccio -- 
+0,Complementare Grafo2,199,NONNA_DI,-1,,Tipo : Person -- id : 3 -- Surname : Cerletti -- graph : 2 -- Name : Anna -- ,
+0,"SemiFissa
+Relazione di tipo NONNA_DI contraddittoria, nei due grafi esplorati esistono ben 3 di queste relazioni
+",-1,,-1,,,
+0,"SemiFissa
+Relazione di tipo NONNO_DI corretta
+",-1,,-1,,,
