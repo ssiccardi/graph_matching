@@ -138,20 +138,21 @@ def addType(conn: Connection, t: str):
             elif flag == "n":
                 print("Operation aborted.")
 
-def addAttribute(conn: Connection, t: str, attribute: str):
+def addAttribute(conn: Connection, t: str, attribute: str, y: bool=False):
     with conn.driver.session(default_access_mode=neo4j.WRITE_ACCESS) as session:
         with session.begin_transaction() as tx:
-
-            print(
-                "A new attribute named "
-                + str(attribute)
-                + " will be added to entity type "
-                + str(t)
-                + ". Continue?"
-            )
-            print("y - yes, n - no")
-            flag = input()
-
+            if not y :
+                print(
+                    "A new attribute named "
+                    + str(attribute)
+                    + " will be added to entity type "
+                    + str(t)
+                    + ". Continue?"
+                )
+                print("y - yes, n - no")
+                flag = input()
+            else:
+                flag = "y"
             if flag == "y":
                 typePresence = tx.run(
                     "MATCH (instance:" + str(t) + " {type: 'entity'}) RETURN instance" #type: ignore

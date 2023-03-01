@@ -3,6 +3,7 @@ sys.path.insert(0, '..')
 
 from Functions.Connection import Connection
 import Functions.MetaModelli as md
+from Functions.Relation import addConstraint
 
 conn = Connection("bolt+s://e3a58db5.databases.neo4j.io:7687", "neo4j", "KR14Xk19s07EJwooFQ9-3dAnH7cL-b9FxnEAVSmG3f0")
 
@@ -14,27 +15,27 @@ md.metamodelloIndirizzo(conn)
 md.metamodelloAutomobile(conn)
 
 #Attrinbuti extra per MetaModello Automobile:
-md.addAttribute(conn, 'Automobile', 'Marca') 
-md.addAttribute(conn, 'Automobile', 'NomeModello') 
-md.addAttribute(conn, 'Automobile', 'Colore') 
-md.addAttribute(conn, 'Automobile', 'Porte') 
-md.addAttribute(conn, 'Automobile', 'Cilindrata') 
-md.addAttribute(conn, 'Automobile', 'LitriSerbatoio')
-md.addAttribute(conn, 'Automobile', 'AriaCondizionata') 
-md.addAttribute(conn, 'Automobile', 'Pneumatici')  
+md.addAttribute(conn, 'Automobile', 'Marca', True) 
+md.addAttribute(conn, 'Automobile', 'NomeModello', True) 
+md.addAttribute(conn, 'Automobile', 'Colore', True) 
+md.addAttribute(conn, 'Automobile', 'Porte', True) 
+md.addAttribute(conn, 'Automobile', 'Cilindrata', True) 
+md.addAttribute(conn, 'Automobile', 'LitriSerbatoio', True)
+md.addAttribute(conn, 'Automobile', 'AriaCondizionata', True) 
+md.addAttribute(conn, 'Automobile', 'Pneumatici', True)  
 
 #Attributi extra per MetaModelli di entita':
-md.addAttribute(conn, 'Person', 'Sesso') #aggiunta sesso a persone
-md.addAttribute(conn, 'Person', 'Altezza') #aggiunta altezza a persone
-md.addAttribute(conn, 'Person', 'Peso') #aggiunta peso a persone
+md.addAttribute(conn, 'Person', 'Sesso', True) #aggiunta sesso a persone
+md.addAttribute(conn, 'Person', 'Altezza', True) #aggiunta altezza a persone
+md.addAttribute(conn, 'Person', 'Peso', True) #aggiunta peso a persone
 
-md.addAttribute(conn, 'Indirizzo', 'Numero_Civico') #aggiunta numero civico ad indirizzo
+md.addAttribute(conn, 'Indirizzo', 'Numero_Civico', True) #aggiunta numero civico ad indirizzo
 
-md.addAttribute(conn, 'Luogo', 'CAP') #aggiunta CAP a luogo
-md.addAttribute(conn, 'Luogo', 'Regione') #aggiunta di regione a luogo
+md.addAttribute(conn, 'Luogo', 'CAP', True) #aggiunta CAP a luogo
+md.addAttribute(conn, 'Luogo', 'Regione', True) #aggiunta di regione a luogo
 
-md.addAttribute(conn, 'Società', 'Capitale') #aggiunta di capitale a società
-md.addAttribute(conn, 'Società', 'NumDipendenti') #aggiunta di numero di dipendenti a società
+md.addAttribute(conn, 'Società', 'Capitale', True) #aggiunta di capitale a società
+md.addAttribute(conn, 'Società', 'NumDipendenti', True) #aggiunta di numero di dipendenti a società
 
 #MetaModelli di relazioni:
 #ESEMPI Person (driver, NOME, RIFL, CARD)
@@ -67,5 +68,13 @@ md.relazione(conn, 'SI_TROVA_VICINO_A', 0, 1)
 
 #ESEMPI Luogo
 md.relazione(conn, 'OSPITA_SOCIETA', 0, "n")
+
+
+#contraddizioni dirette:
+print(addConstraint('MARITO_DI', 'MOGLIE_DI', 'CONTRADDITTORI', conn))
+print(addConstraint('MADRE_DI', 'PADRE_DI', 'CONTRADDITTORI', conn))
+print(addConstraint('ZIO_DI', 'ZIA_DI', 'CONTRADDITTORI', conn))
+print(addConstraint('NONNO_DI', 'NONNA_DI', 'CONTRADDITTORI', conn))
+print(addConstraint('CUGINO_DI', 'CUGINA_DI', 'CONTRADDITTORI', conn))
 
 conn.close()

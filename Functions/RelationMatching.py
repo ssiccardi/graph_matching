@@ -104,7 +104,7 @@ def relationMatching(id: int, conn: Connection):
         id (int): [id appartenente all'entita' da analizzare]
         conn (Connection): [oggetto dedicato alla connessione a Neo4j]
     """
-    df = pd.DataFrame(columns=["Tipo", "IDRelazioneG1", "TipoRelG1", "IDRelazioneG2", "TipoRelG2", "Attr. G1","Attr. G2"])
+    df = pd.DataFrame(columns=["Tipo", "IDRelazioneG1", "TipoRelG1", "IDRelazioneG2", "TipoRelG2", "Attr. G1","Attr. G2"])    
     
     relP1, relP2 = getRel(id, 1, 0, conn), getRel(id, 2, 0, conn)
     relE1, relE2 = getRel(id, 1, 1, conn), getRel(id, 2, 1, conn)
