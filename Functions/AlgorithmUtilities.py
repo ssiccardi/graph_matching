@@ -1,8 +1,16 @@
 from Functions.Connection import Connection
 import pandas as pd 
 
-def _isNode(el):
-    return str(type(el)) == "<class 'neo4j.graph.Node'>"
+def removeExpired(lst: list, rmv:  list):
+    """Rimuove tutti gli attributi presenti in rmv da lst e pulisce rmv
+
+    Args:
+        lst (list): lista da cui togliere elementi
+        rmv (list): lista con elementi da togliere
+    """    
+    for r in rmv:
+        lst.remove(r)
+    rmv.clear()
 
 def _whichGraph(g):
     if g == "G1":
@@ -423,12 +431,17 @@ def sameRel(r1, r2, id, direzione: int, conn: Connection):
 
     return res.pop()[0]  
 
-def overLimit(tipo: str, val: int, conn: Connection)-> list:
+def toStr(l : list[str])-> str:
+    s = "\n"
+    for el in l: s += el + "\n"
+    return s
+
+def overLimit(tipo: str, val, conn: Connection)-> list:
     """Ritorna una lista di stringhe che descrivono lo stato delle relazioni SemiFisse considerate
 
     Args:
         tipo (str): tipo della relazione
-        val (int): Valore limite associato a tipo
+        val (int or str): Valore limite associato a tipo
         conn (Connection): oggetto dedicato alla connessione con Neo4j
 
     Returns:
@@ -476,14 +489,14 @@ def updateDF_Entity(cfr: str, typeEnt: str = " ", id1: int = -1, id2: int = -1, 
             "Tipo attributo Entità Grafo2" : [typeAttr2], "Attributo Entità Grafo2" : [valueAttr2]
     })
     
-def updateDF(src: dict, dst: dict, rel1: int, rel2: int, tipo1: str, tipo2: str, ril: str)-> pd.DataFrame:
+def updateDF(ril: str, src: dict = dict(), dst: dict = dict(), rel1: int = -1, rel2: int = -1, tipo1: str = "", tipo2: str = "")-> pd.DataFrame:
     l = []
     s = ""
-    if src is not None:
+    if src != dict():
         for key in src.keys(): s += str(key) + " : " + str(src.get(key)) + " -- "
     l.append(s) 
     s = ""
-    if dst is not None:
+    if dst != dict():
         for key in dst.keys(): s += str(key) + " : " + str(dst.get(key)) + " -- "
     l.append(s) 
 
