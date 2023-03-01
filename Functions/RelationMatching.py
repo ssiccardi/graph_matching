@@ -1,4 +1,5 @@
 import pandas as pd
+from Utility.pandasFormatter import formatCSV
 from Functions.AlgorithmUtilities import (
     createTypeBucket,
     getRel,
@@ -174,4 +175,11 @@ def relationMatching(id: int, conn: Connection):
         df = pd.concat([df, updateDF("Complementare Grafo2", getEntity(rel.get('da'), conn), rel1 = rel.get('id'), tipo1 = rel.get('tipo'))], axis=0)
         
     df = _getInfoSemi(id, conn, df)
+    
+    f = open("../Contents/RelationMatchingAnalisi.csv", "w")
+    f.write(df.to_csv())
+    f.close()
+    
+    formatCSV()
+    
     return df
