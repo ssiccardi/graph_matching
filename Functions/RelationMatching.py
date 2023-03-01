@@ -94,13 +94,14 @@ def _getInfoSemi(id: int, conn: Connection, df: pd.DataFrame) -> pd.DataFrame:
 
 
 def relationMatching(id: int, conn: Connection):
-    """Analizza le relazioni legate all'id passato in input, mostrando all'utente cosa nota\n
+    """Analizza le relazioni legate all'id passato in input, mostrando all'utente cosa nota
     PreCondizioni:
-        1)Le entita' esistono e non sono contraddittorie\n
-        2)Le relazioni fisse hanno subito un controllo in inserimento, non ci possono essere piu' relazioni fisse uguali appartenenti alla stessa entita' di uno stesso grafo\n
-        3)Le relazioni semifisse hanno subito lo stesso controllo in inserimento!\n
+        1)Le entita' esistono e non sono contraddittorie
+        2)Le relazioni fisse hanno subito un controllo in inserimento, non ci possono essere piu' relazioni fisse uguali appartenenti alla stessa entita' di uno stesso grafo
+        3)Le relazioni semifisse hanno subito lo stesso controllo in inserimento!
+    
     Args:
-        id (int): [id appartenente all'entita' da analizzare]\n
+        id (int): [id appartenente all'entita' da analizzare]
         conn (Connection): [oggetto dedicato alla connessione a Neo4j]
     """
     df = pd.DataFrame(columns=["Tipo", "IDRelazioneG1", "TipoRelG1", "IDRelazioneG2", "TipoRelG2", "Attr. G1","Attr. G2"])
