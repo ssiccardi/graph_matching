@@ -97,7 +97,7 @@ def entityMatching(ideng: int, conn: Connection)-> str:
         )
         df = pd.concat([df, updateDF_Entity(cfr="Complementare", typeEnt=tipo1, id2=id2, typeAttr2=key, valueAttr2=str(attrG2.get(key)))], axis=0)
             
-    f = open("/home/pietro/graph_matching/Contents/EntityMatchingAnalisi.csv", "w")
+    f = open("../Contents/EntityMatchingAnalisi.csv", "w")
     f.write(df.to_csv())
     f.close()
 
