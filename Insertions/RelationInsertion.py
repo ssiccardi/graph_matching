@@ -8,6 +8,11 @@ conn = Connection("bolt+s://e3a58db5.databases.neo4j.io:7687", "neo4j", "KR14Xk1
 
 #GRAFO 1:
 #con destinazione Pietro Masolini
+ES_attr, ET_attr = {"Targa" : "DC952JK", "Marca" : "Fiat", "NomeModello" : "Punto", "Colore" : "Nero", "Pneumatici" : "Neve",
+                    "AriaCondizionata" : "Presente", "LitriSerbatoio" :  "48"}, {'Name':'Pietro', 'Surname':'Masolini'}
+print(create_relation_dir('Automobile', ES_attr, 1, 'Person', ET_attr, 1, 'POSSIEDE', conn)) #G1
+ES_attr, ET_attr = {"RagioneSociale" : "La Terrazza"}, {'Name':'Pietro', 'Surname':'Masolini'}
+print(create_relation_dir('Società', ES_attr, 1, 'Person', ET_attr, 1, 'LAVORA_IN', conn)) #G1
 ES_attr, ET_attr = {'Name': 'Paola', 'Surname': 'Scaramellini'}, {'Name':'Pietro', 'Surname':'Masolini'}
 print(create_relation_dir('Person', ES_attr, 1, 'Person', ET_attr, 1, 'MADRE_DI', conn)) #G1
 ES_attr, ET_attr = {'Name': 'Aneli', 'Surname': 'Balatti'}, {'Name':'Pietro', 'Surname':'Masolini'}

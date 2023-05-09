@@ -6,8 +6,9 @@ from Functions.Entity import create_instance_mine
 from Functions.MetaModelli import metamodelloAutomobile, addAttribute
 
 conn = Connection("bolt+s://e3a58db5.databases.neo4j.io:7687", "neo4j", "KR14Xk19s07EJwooFQ9-3dAnH7cL-b9FxnEAVSmG3f0")
-
-#GRAFO 1:
+#
+##GRAFO 1:
+create_instance_mine(conn, "Società", {"RagioneSociale" : "La Terrazza"}, 1, 1)
 create_instance_mine(conn, "Person", {"Name" : "Pietro", "Surname" : "Masolini"}, 1, 1)
 create_instance_mine(conn, "Person", {"Name" : "Paola", "Surname" : "Scaramellini"}, 1, 2)
 create_instance_mine(conn, "Person", {"Name" : "Aneli", "Surname" : "Balatti"}, 1, 3)

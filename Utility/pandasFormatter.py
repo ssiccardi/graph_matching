@@ -14,7 +14,7 @@ def _max(s):
 def _getMax(s):
     m = 0
     for row in s:
-        tmp = max(row)
+        tmp = _max(row)
         if tmp > m:
             m = tmp
     return m

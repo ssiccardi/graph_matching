@@ -1,8 +1,8 @@
 ,Descrizione confronto attributo,Tipo Entità,ID Entità Grafo1,Tipo attributo Entità Grafo1,Attributo Entità Grafo1,ID Entità Grafo2,Tipo attributo Entità Grafo2,Attributo Entità Grafo2
-0,Contraddittorie,Automobile,20,AriaCondizionata,Presente,21,AriaCondizionata,Assente
-0,Contraddittorie,Automobile,20,Colore,Nero,21,Colore,Grigio
-0,Coincidenti,Automobile,20,Marca,Fiat,21,Marca,Fiat
-0,Coincidenti,Automobile,20,NomeModello,Punto,21,NomeModello,Punto
-0,Contraddittorie,Automobile,20,Pneumatici,Neve,21,Pneumatici,4Stagioni
-0,Complementare,Automobile,20,LitriSerbatoio,48,-1, , 
-0,Complementare,Automobile,-1, , ,21,Porte,3
+0,Contraddittorie,Automobile,120,AriaCondizionata,Presente,121,AriaCondizionata,Assente
+0,Contraddittorie,Automobile,120,Colore,Nero,121,Colore,Grigio
+0,Coincidenti,Automobile,120,Marca,Fiat,121,Marca,Fiat
+0,Coincidenti,Automobile,120,NomeModello,Punto,121,NomeModello,Punto
+0,Contraddittorie,Automobile,120,Pneumatici,Neve,121,Pneumatici,4Stagioni
+0,Complementare,Automobile,120,LitriSerbatoio,48,-1, , 
+0,Complementare,Automobile,-1, , ,121,Porte,3
